@@ -50,7 +50,7 @@
             <aside class="sidebar left-sidebar" id="leftSidebar">
                 <div class="sidebar-header">
                     <h2 class="sidebar-title">Techniques</h2>
-                    <button class="minimize-btn" onclick="toggleSidebar('left')" title="Minimize">
+                    <button class="minimize-btn" id="leftMinimizeBtn" title="Minimize">
                         <i class="fas fa-chevron-left"></i>
                     </button>
                 </div>
@@ -61,7 +61,7 @@
 
             <!-- Main Section -->
             <main class="main-section">
-                <button class="control-btn" id="topBackBtn" onclick="if(isViewingSheet){ exitSheetView(); }" style="position:absolute; top:12px; left:12px; z-index:100; display:none;">
+                <button class="control-btn" id="topBackBtn" style="position:absolute; top:12px; left:12px; z-index:100; display:none;">
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <div class="content-body" id="mainContent">
@@ -78,11 +78,11 @@
                 <div class="sidebar-header">
                     <div class="ai-header-content">
                         <h2 class="sidebar-title">AI Assistant</h2>
-                        <button class="chat-history-btn" onclick="toggleChatHistory()" title="Chat History">
+                        <button class="chat-history-btn" id="chatHistoryBtn" title="Chat History">
                             <i class="fas fa-history"></i>
                         </button>
                     </div>
-                    <button class="minimize-btn" onclick="toggleSidebar('right')" title="Minimize">
+                    <button class="minimize-btn" id="rightMinimizeBtn" title="Minimize">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -102,7 +102,7 @@
                                 rows="1"
                                 aria-label="Chat message input field"
                             ></textarea>
-                            <button class="chat-send-btn" onclick="sendChatMessage()" title="Send message">
+                            <button class="chat-send-btn" id="chatSendBtn" title="Send message">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -112,10 +112,10 @@
         </div>
 
         <!-- Restore Buttons -->
-        <button class="restore-btn left" id="leftRestoreBtn" onclick="toggleSidebar('left')" style="display: none;">
+        <button class="restore-btn left" id="leftRestoreBtn" style="display: none;">
             <i class="fas fa-chevron-right"></i>
         </button>
-        <button class="restore-btn right" id="rightRestoreBtn" onclick="toggleSidebar('right')" style="display: none;">
+        <button class="restore-btn right" id="rightRestoreBtn" style="display: none;">
             <i class="fas fa-chevron-left"></i>
         </button>
 

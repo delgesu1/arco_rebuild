@@ -271,7 +271,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                         mainContent.innerHTML = `
                             <div class="sheet-music-grid">
                                 ${resultingSheets.map((sheet, index) => `
-                                    <div class="sheet-item" onclick="viewSheetMusic('${sheet.title}', '${sheet.composer}')">
+                                    <div class="sheet-item" data-title="${sheet.title}" data-composer="${sheet.composer}">
                                         <div class="sheet-thumbnail">
                                             <img src="public/images/rode-01.png" alt="${sheet.title} thumbnail">
                                         </div>
@@ -283,8 +283,19 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                                 `).join('')}
                             </div>
                         `;
+                        attachSheetItemListeners();
                     }
                 }
+            });
+        }
+
+        function attachSheetItemListeners() {
+            document.querySelectorAll('.sheet-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const title = item.dataset.title;
+                    const composer = item.dataset.composer;
+                    viewSheetMusic(title, composer);
+                });
             });
         }
 
@@ -311,7 +322,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                             <div class="pdf-controls-group">
                                 <button id="zoom-in" class="pdf-control-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
                                 <button id="zoom-out" class="pdf-control-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
-                                <button id="pdf-download" class="pdf-control-btn" title="Download" onclick="window.open('public/images/rode-01.pdf', '_blank')"><i class="fas fa-download"></i></button>
+                                <button id="pdf-download" class="pdf-control-btn" title="Download"><i class="fas fa-download"></i></button>
                             </div>
                         </div>
                         <div id="pdf-container">
@@ -325,6 +336,11 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             // Initialize PDF rendering with PDF.js
             initPDFViewer('public/images/rode-01.pdf');
             document.getElementById('topBackBtn').style.display = 'inline-flex';
+
+            const downloadBtn = document.getElementById('pdf-download');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => window.open('public/images/rode-01.pdf', '_blank'));
+            }
         }
 
         // PDF.js viewer initialization
@@ -538,7 +554,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                     helpDiv.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h3 style="margin:0;">Keyboard Shortcuts</h3>
-                            <button onclick="this.parentElement.parentElement.style.display='none'" 
+                            <button id="pdf-help-close" 
                                 style="background:none; border:none; cursor:pointer; color:var(--md-sys-color-on-surface);">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -559,6 +575,10 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                     `;
                     
                     document.getElementById('pdf-container').appendChild(helpDiv);
+                    const helpClose = helpDiv.querySelector('#pdf-help-close');
+                    if (helpClose) {
+                        helpClose.addEventListener('click', () => { helpDiv.style.display = 'none'; });
+                    }
                 }
             }
         }
@@ -702,7 +722,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
 
         function updateChatSendButton() {
             const chatInput = document.querySelector('.chat-input');
-            const chatSendBtn = document.querySelector('.chat-send-btn');
+            const chatSendBtn = document.getElementById('chatSendBtn');
             
             if (chatInput && chatSendBtn) {
                 if (chatInput.value.trim() !== '') {
@@ -775,12 +795,15 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             const searchInput = document.querySelector('.search-input'); 
             const resetSearchBtn = document.getElementById('resetSearchBtn'); // New reset button
             const chatInput = document.querySelector('.chat-input');
-            const chatSendBtn = document.querySelector('.chat-send-btn');
+            const chatSendBtn = document.getElementById('chatSendBtn');
             const aiChatSidebar = document.getElementById('aiChatSidebar');
-            const minimizeChatBtn = document.getElementById('minimizeChat');
-            const restoreChatBtn = document.getElementById('restoreChatBtn');
+            const leftMinimizeBtn = document.getElementById('leftMinimizeBtn');
+            const rightMinimizeBtn = document.getElementById('rightMinimizeBtn');
+            const leftRestoreBtn = document.getElementById('leftRestoreBtn');
+            const rightRestoreBtn = document.getElementById('rightRestoreBtn');
             const chatHistoryBtn = document.getElementById('chatHistoryBtn');
             // const inDepthAnalysisBtn = document.querySelector('.in-depth-btn'); // This button is dynamically added
+            const topBackBtn = document.getElementById('topBackBtn');
 
             if (searchInput) { 
                 searchInput.addEventListener('input', function() {
@@ -797,12 +820,12 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             }
 
             if (resetSearchBtn) { 
-                resetSearchBtn.onclick = () => {
+                resetSearchBtn.addEventListener('click', () => {
                     searchInput.value = '';
                     performSearch(true); // Pass true to indicate it's a reset action from 'X' button
                     resetSearchBtn.style.display = 'none'; // Explicitly hide after click
                     searchInput.focus(); // Set focus back to search input
-                };
+                });
             }
 
             // Event listeners for chat functionality (remains largely the same)
@@ -821,7 +844,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                 chatInput.addEventListener('keydown', function(event) {
                     if (event.key === 'Enter' && !event.shiftKey) {
                         event.preventDefault();
-                        const btn = document.querySelector('.chat-send-btn');
+                        const btn = document.getElementById('chatSendBtn');
                         if (btn.classList.contains('active')) {
                             btn.classList.add('sending');
                             setTimeout(() => btn.classList.remove('sending'), 300);
@@ -835,19 +858,33 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             }
 
             if (chatSendBtn) {
-                chatSendBtn.onclick = () => sendChatMessage();
+                chatSendBtn.addEventListener('click', sendChatMessage);
             }
 
-            if (minimizeChatBtn) {
-                minimizeChatBtn.onclick = () => toggleSidebar('right');
+            if (leftMinimizeBtn) {
+                leftMinimizeBtn.addEventListener('click', () => toggleSidebar('left'));
             }
-            if (restoreChatBtn) {
-                restoreChatBtn.onclick = () => toggleSidebar('right');
+            if (rightMinimizeBtn) {
+                rightMinimizeBtn.addEventListener('click', () => toggleSidebar('right'));
+            }
+            if (leftRestoreBtn) {
+                leftRestoreBtn.addEventListener('click', () => toggleSidebar('left'));
+            }
+            if (rightRestoreBtn) {
+                rightRestoreBtn.addEventListener('click', () => toggleSidebar('right'));
             }
             if (chatHistoryBtn) {
-                chatHistoryBtn.onclick = () => toggleChatHistory();
+                chatHistoryBtn.addEventListener('click', toggleChatHistory);
             }
             // The inDepthAnalysisBtn event listener is added when the button is created in addMessage
+
+            if (topBackBtn) {
+                topBackBtn.addEventListener('click', () => {
+                    if (isViewingSheet) {
+                        exitSheetView();
+                    }
+                });
+            }
 
             updateChatSendButton();
             // updateMainContent(); // Not needed here, performSearch or populateTechniques will handle it.
@@ -924,7 +961,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             
             if (isInitial && sender === 'assistant') {
                 messageHTML += `
-                    <button class="in-depth-btn" onclick="requestInDepthAnalysis()">
+                    <button class="in-depth-btn">
                         <i class="fas fa-brain"></i>
                         Get In-Depth Analysis
                     </button>
@@ -943,6 +980,12 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                     timestamp: now,
                     isInitial
                 });
+            }
+
+            // attach listener for newly added in-depth button if present
+            const depthBtn = messageDiv.querySelector('.in-depth-btn');
+            if (depthBtn) {
+                depthBtn.addEventListener('click', requestInDepthAnalysis);
             }
         }
 
@@ -1087,7 +1130,7 @@ Would you like specific exercises for any particular technique? I can provide de
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3>Conversation History</h3>
-                        <button class="modal-close" onclick="this.closest('.chat-history-modal').remove()">
+                        <button class="modal-close">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -1095,7 +1138,7 @@ Would you like specific exercises for any particular technique? I can provide de
                         <div class="history-list">
                             ${Object.keys(conversations).length > 0 ? 
                                 Object.keys(conversations).map(id => `
-                                    <div class="history-item" onclick="loadConversation('${id}')">
+                                    <div class="history-item" data-id="${id}">
                                         <div class="history-title">Conversation ${id}</div>
                                         <div class="history-preview">${conversations[id][0]?.content.substring(0, 50) || 'No messages'}...</div>
                                     </div>
@@ -1105,9 +1148,23 @@ Would you like specific exercises for any particular technique? I can provide de
                         </div>
                     </div>
                 </div>
-                <div class="modal-backdrop" onclick="this.closest('.chat-history-modal').remove()"></div>
+                <div class="modal-backdrop"></div>
             `;
             document.body.appendChild(modal);
+
+            // modal interactions
+            const closeBtn = modal.querySelector('.modal-close');
+            if (closeBtn) closeBtn.addEventListener('click', () => modal.remove());
+
+            const backdrop = modal.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.addEventListener('click', () => modal.remove());
+
+            modal.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    loadConversation(item.dataset.id);
+                    modal.remove();
+                });
+            });
         }
 
         function loadConversation(conversationId) {
