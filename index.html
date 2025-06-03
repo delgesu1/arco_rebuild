@@ -1,0 +1,2618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arco - Professional Classical Violin Practice Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .technique-preview-content {
+            padding: 2rem;
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .technique-preview-content h3 {
+            color: var(--md-sys-color-primary);
+            margin-bottom: 1rem;
+        }
+        .technique-preview-content p {
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        :root {
+            --md-sys-color-primary: #3B82F6;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #2563EB;
+            --md-sys-color-on-primary-container: #FFFFFF;
+            --md-sys-color-secondary: #A0A0A5;
+            --md-sys-color-on-secondary: #1F1F23;
+            --md-sys-color-secondary-container: #2D2D32;
+            --md-sys-color-on-secondary-container: #E0E0E5;
+            --md-sys-color-tertiary: #EFB8C8;
+            --md-sys-color-on-tertiary: #492532;
+            --md-sys-color-surface: #1C1C21;
+            --md-sys-color-surface-variant: #222226;
+            --md-sys-color-on-surface: #E0E0E5;
+            --md-sys-color-on-surface-variant: #9A9AA0;
+            --md-sys-color-outline: #303035;
+            --md-sys-color-outline-variant: #2A2A2F;
+            --md-sys-color-background: #303134;
+            --md-sys-color-on-background: #E0E0E5;
+            --md-sys-color-surface-container: #242428;
+            --md-sys-color-surface-container-high: #2D2D32;
+            --md-sys-color-surface-container-highest: #38383D;
+            --md-sys-color-surface-bright: #44444A;
+            --md-sys-color-surface-dim: #141418;
+            --md-sys-elevation-1: 0 1px 3px rgba(0,0,0,0.5);
+            --md-sys-elevation-2: 0 2px 6px rgba(0,0,0,0.6);
+            --md-sys-elevation-3: 0 4px 8px rgba(0,0,0,0.7);
+            --md-sys-elevation-4: 0 6px 10px rgba(0,0,0,0.8);
+            --md-sys-elevation-5: 0 8px 12px rgba(0,0,0,0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #303134;
+            color: var(--md-sys-color-on-background);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #303134;
+            padding: 0 12px 12px;
+            gap: 12px;
+        }
+
+        /* Header */
+        .header {
+            background: transparent;
+            border-bottom: none;
+            box-shadow: none;
+            padding: 1rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 60% 1fr;
+            align-items: center;
+            height: 64px;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--md-sys-color-primary);
+            text-decoration: none;
+            min-width: max-content;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        /* Enhanced Search Bar */
+        .search-container {
+            width: 100%;
+            grid-column: 2;
+            justify-self: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            background: var(--md-sys-color-surface-container);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 28px;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .search-wrapper:hover {
+            border-color: var(--md-sys-color-outline);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-wrapper:focus-within {
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.2), 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: var(--md-sys-color-surface-container-high);
+        }
+
+        .search-input-container {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 12px;
+            height: 48px;
+        }
+
+        .search-icon {
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .search-wrapper:focus-within .search-icon {
+            color: var(--md-sys-color-primary);
+            opacity: 1;
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--md-sys-color-on-surface);
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 400;
+            line-height: 1.5;
+            height: 100%;
+        }
+
+        .search-input::placeholder {
+            color: var(--md-sys-color-on-surface-variant);
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        .search-btn {
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--md-sys-color-on-surface-variant);
+            opacity: 0;
+            transform: scale(0.8);
+            flex-shrink: 0;
+        }
+
+        .search-wrapper:focus-within .search-btn,
+        .search-input:not(:placeholder-shown) + .search-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .search-btn:hover {
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            transform: scale(1.05);
+        }
+
+        .search-btn:active {
+            transform: scale(0.95);
+        }
+
+        .search-btn i {
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .icon-btn:hover {
+            background: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-on-surface);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 12px;
+        }
+
+        /* Sidebar Base Styles */
+        .sidebar {
+            background: var(--md-sys-color-surface-container);
+            border-right: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: var(--md-sys-elevation-1);
+        }
+
+        .sidebar.minimized {
+            width: 0 !important;
+            min-width: 0 !important;
+            overflow: hidden;
+            border-right: none;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .minimize-btn {
+            background: none;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .minimize-btn:hover {
+            background: var(--md-sys-color-surface-container-highest);
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+        }
+
+        /* Webkit scrollbar styling for sidebar */
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: var(--md-sys-color-outline-variant);
+            border-radius: 3px;
+            opacity: 0.6;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: var(--md-sys-color-outline);
+            opacity: 0.8;
+        }
+
+        /* Hide scrollbar when not hovered */
+        .sidebar-content::-webkit-scrollbar {
+            width: 0px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar:hover .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        /* Left Sidebar */
+        .left-sidebar {
+            width: 20%;
+            min-width: 280px;
+            margin-top: 0;
+        }
+
+        .technique-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--md-sys-color-primary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .technique-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .technique-tag {
+            background: var(--md-sys-color-surface-container-high);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: var(--md-sys-color-on-surface);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            user-select: none;
+        }
+
+        .technique-tag:hover {
+            background: var(--md-sys-color-surface-container-highest);
+            border-color: var(--md-sys-color-primary);
+            transform: translateY(-1px);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        .technique-tag.selected {
+            background: var(--md-sys-color-primary-container);
+            border-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        .technique-tag.selected::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--md-sys-color-primary);
+            border-radius: 50%;
+            border: 2px solid var(--md-sys-color-surface-container);
+        }
+
+        .selection-counter {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: var(--md-sys-elevation-3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            transform: translateY(100px);
+            opacity: 0;
+        }
+
+        .selection-counter.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Main Section */
+        .main-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1f2226;
+            border-radius: 12px;
+            overflow: hidden auto;
+            scrollbar-width: thin;
+            position: relative; /* For positioning the back button */
+        }
+
+        .main-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-section::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 4px;
+        }
+
+        .main-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+
+        .main-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .content-header {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            background: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .content-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .content-subtitle {
+            margin-left: 0.5rem;
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 0.75rem;
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+            background: transparent;
+        }
+
+        .content-body.fade-out {
+            opacity: 0;
+        }
+
+        .sheet-music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .sheet-item {
+            background: var(--md-sys-color-surface-container);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--md-sys-color-outline-variant);
+        }
+
+        .sheet-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--md-sys-elevation-4);
+            border-color: var(--md-sys-color-primary);
+        }
+
+        .sheet-thumbnail {
+            width: 100%;
+            height: 124px;
+            background: var(--md-sys-color-surface-container-high);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .sheet-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .sheet-info {
+            padding: 1rem;
+        }
+
+        .sheet-title {
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .sheet-composer {
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: 0.75rem;
+        }
+
+        .sheet-viewer {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sheet-display {
+            width: 100%;
+            height: 80vh;
+            margin: 0 auto;
+            background: transparent;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: none;
+        }
+        
+        .pdf-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #pdf-container {
+            overflow-y: auto;
+            background: transparent;
+            padding: 0 0 20px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        
+        #pdf-canvas {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-height: 100%;
+            max-width: 90%;
+        }
+        
+        .pdf-toolbar {
+            background: var(--md-sys-color-surface-container-high);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .pdf-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #page-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 5px 10px;
+            background: var(--md-sys-color-surface-container);
+            border-radius: 20px;
+        }
+        
+        #page-num, #page-count {
+            font-weight: 500;
+            min-width: 25px;
+            text-align: center;
+        }
+        
+        .pdf-control-btn {
+            background: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-on-surface);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pdf-control-btn:hover {
+            background: var(--md-sys-color-surface-container-highest);
+        }
+        
+        .pdf-control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sheet-controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: var(--md-sys-color-primary-container);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: var(--md-sys-color-on-primary-container);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        /* Right Sidebar - Chat */
+        .right-sidebar {
+            width: 20%;
+            min-width: 320px;
+            border-left: 1px solid var(--md-sys-color-outline-variant);
+            border-right: none;
+            box-shadow: var(--md-sys-elevation-1);
+            margin-top: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1; /* Grow to fill available space in .right-sidebar */
+            min-height: 0; /* Allow proper shrinking for nested flex items */
+            position: relative; /* Keep for potential pseudo-elements */
+        }
+
+        .chat-messages {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--md-sys-color-outline-variant);
+            border-radius: 3px;
+        }
+        .chat-input-container {
+            padding: 0.75rem 1rem;
+            background: #1f2226;
+            flex-shrink: 0;
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            background: var(--md-sys-color-surface-container-high);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chat-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-history-btn {
+            background: none;
+            border: none;
+            border-radius: 6px;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .chat-history-btn:hover {
+            background: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.assistant {
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            padding: 0.875rem 1.125rem;
+            border-radius: 18px;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-bubble {
+            background: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-on-surface);
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-top: 0.25rem;
+            opacity: 0.7;
+        }
+
+        .in-depth-btn {
+            background: linear-gradient(135deg, var(--md-sys-color-primary-container), var(--md-sys-color-secondary-container));
+            border: none;
+            border-radius: 16px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            color: var(--md-sys-color-on-primary-container);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(187, 134, 252, 0.2);
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .in-depth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .in-depth-btn:hover::before {
+            left: 100%;
+        }
+
+        .in-depth-btn:hover {
+            background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+            color: var(--md-sys-color-on-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(187, 134, 252, 0.3);
+            border-color: var(--md-sys-color-primary);
+        }
+
+        .in-depth-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(187, 134, 252, 0.2);
+        }
+
+        .in-depth-btn i {
+            font-size: 16px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
+
+        .chat-input-container {
+            padding: 1rem 1.25rem 1.25rem;
+            border-top: 1px solid var(--md-sys-color-outline-variant);
+            background: #1f2226;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .chat-input-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            background: var(--md-sys-color-surface-container-high);
+            border-radius: 24px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.15), 0 4px 10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+        
+        .chat-input-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+        
+        .chat-input-wrapper:focus-within::after {
+            transform: scaleX(1);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--md-sys-color-on-surface);
+            font-size: 0.9375rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 22px;
+            max-height: 160px;
+            overflow-y: hidden;
+            line-height: 1.5;
+            padding: 2px 0;
+            transition: all 0.2s ease;
+        }
+
+        .chat-input::-webkit-scrollbar { display: none; }
+
+        .chat-input::placeholder {
+            color: var(--md-sys-color-on-surface-variant);
+            opacity: 0.7;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        
+        .chat-input:focus::placeholder {
+            opacity: 0.5;
+            transform: translateX(3px);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--md-sys-color-on-primary);
+            opacity: 0.5;
+            pointer-events: none;
+            margin-bottom: -2px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chat-send-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chat-send-btn.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-send-btn.active:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
+        }
+        
+        .chat-send-btn.active:hover::before {
+            opacity: 1;
+        }
+        
+        .chat-send-btn.active:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 6px rgba(187, 134, 252, 0.2);
+        }
+        
+        .chat-send-btn i {
+            font-size: 0.9375rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .chat-send-btn.active:hover i {
+            transform: translateX(1px) translateY(-1px);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.125rem;
+            background: var(--md-sys-color-surface-container-high);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            font-size: 0.875rem;
+            color: var(--md-sys-color-on-surface-variant);
+            max-width: 85%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            animation: pulseIndicator 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulseIndicator {
+            0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+            50% { box-shadow: 0 2px 12px rgba(187, 134, 252, 0.15); }
+            100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+            border-radius: 50%;
+            animation: typingDot 1.4s infinite ease-in-out;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingDot {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Animation for chat input */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        .chat-input-wrapper.shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff6b6b;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        .chat-send-btn.pulse {
+            animation: pulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Restore Buttons */
+        .restore-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--md-sys-color-primary);
+            border: none;
+            border-radius: 0 8px 8px 0;
+            width: 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--md-sys-color-on-primary);
+            box-shadow: var(--md-sys-elevation-3);
+            z-index: 1001;
+        }
+
+        .restore-btn.left {
+            left: 0;
+        }
+
+        .restore-btn.right {
+            right: 0;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .restore-btn:hover {
+            width: 40px;
+            box-shadow: var(--md-sys-elevation-4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .left-sidebar, .right-sidebar {
+                width: 25%;
+                min-width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.25rem;
+            }
+            
+            .search-container {
+                max-width: none;
+            }
+            
+            .left-sidebar, .right-sidebar {
+                width: 100%;
+                min-width: 100%;
+                position: absolute;
+                top: 0;
+                height: 100%;
+                z-index: 1000;
+            }
+            
+            .left-sidebar {
+                left: 0;
+            }
+            
+            .right-sidebar {
+                right: 0;
+            }
+        }
+
+        /* Chat History Modal */
+        .chat-history-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .chat-history-modal .modal-content {
+            background: var(--md-sys-color-surface-container);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: var(--md-sys-elevation-3);
+        }
+
+        .chat-history-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chat-history-modal .modal-close {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .chat-history-modal .modal-close:hover {
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .chat-history-modal .modal-body {
+            padding: 1rem;
+        }
+
+        .chat-history-modal .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-history-modal .history-item {
+            background: var(--md-sys-color-surface-container-high);
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-history-modal .history-item:hover {
+            background: var(--md-sys-color-surface-container-highest);
+            transform: translateY(-2px);
+            box-shadow: var(--md-sys-elevation-2);
+        }
+
+        .chat-history-modal .history-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .chat-history-modal .history-preview {
+            font-size: 0.875rem;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-top: 0.25rem;
+        }
+
+        .chat-history-modal .no-history {
+            text-align: center;
+            padding: 2rem;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .chat-history-modal .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* === Flat Design Overrides === */
+        .header,
+        .sidebar,
+        .search-wrapper,
+        .search-wrapper:hover,
+        .search-wrapper:focus-within {
+            box-shadow: none !important;
+        }
+
+        /* === Typography Enhancements === */
+        :root {
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-size-base: 15px;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            font-size: var(--font-size-base);
+            line-height: 1.65;
+            color: var(--md-sys-color-on-background);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-family-primary);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--md-sys-color-on-surface);
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 { font-size: var(--font-size-xl); }
+        h2 { font-size: calc(var(--font-size-lg) + 0.125rem); }
+        h3 { font-size: var(--font-size-lg); }
+        h4 { font-size: calc(var(--font-size-md) + 0.125rem); }
+        h5 { font-size: var(--font-size-md); }
+        h6 { font-size: var(--font-size-sm); }
+
+        p, li, label, input, textarea {
+            font-size: 0.9375rem;
+            letter-spacing: -0.005em;
+        }
+
+        .section-title {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+        
+        .left-sidebar,
+        .right-sidebar,
+        .content-body {
+            background: #1f2226;
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* === Alignment & Rounding Overrides === */
+        .left-sidebar,
+        .right-sidebar {
+            margin-top: 0 !important;
+            border-radius: 12px;
+        }
+        .main-section {
+            border-radius: 12px;
+        }
+    </style>
+    <!-- PDF.js viewer library -->    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.min.js"></script>
+    <script>
+        // PDF.js initialization
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js';
+        }
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header" data-component-name="<header />">
+            <a href="#" class="logo">
+                <i class="fas fa-music"></i>
+                Arco
+            </a>
+            
+            <div class="search-container">
+                <div class="search-wrapper" data-component-name="<div />">
+                    <div class="search-input-container" data-component-name="<div />">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search techniques, ask questions, or describe what you want to practice..." maxlength="200" data-component-name="<input />" />
+                        <button class="search-btn" id="resetSearchBtn" title="Clear search" type="button" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="icon-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="icon-btn" title="Profile">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Sidebar -->
+            <aside class="sidebar left-sidebar" id="leftSidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">Techniques</h2>
+                    <button class="minimize-btn" onclick="toggleSidebar('left')" title="Minimize">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+                <div class="sidebar-content" id="techniqueContainer">
+                    <!-- Techniques will be populated by JavaScript -->
+                </div>
+            </aside>
+
+            <!-- Main Section -->
+            <main class="main-section">
+                <button class="control-btn" id="topBackBtn" onclick="if(isViewingSheet){ exitSheetView(); }" style="position:absolute; top:12px; left:12px; z-index:100; display:none;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="content-body" id="mainContent">
+                    <div class="empty-state">
+                        <i class="fas fa-music"></i>
+                        <h3>Welcome to Arco</h3>
+                        <p>Search for techniques or select from the sidebar to get started with your practice session.</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Sidebar -->
+            <aside class="sidebar right-sidebar" id="rightSidebar">
+                <div class="sidebar-header">
+                    <div class="ai-header-content">
+                        <h2 class="sidebar-title">AI Assistant</h2>
+                        <button class="chat-history-btn" onclick="toggleChatHistory()" title="Chat History">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    </div>
+                    <button class="minimize-btn" onclick="toggleSidebar('right')" title="Minimize">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="empty-state">
+                            <i class="fas fa-robot"></i>
+                            <h3>AI Practice Assistant</h3>
+                            <p>Ask questions about violin techniques, get practice advice, or describe what you'd like to work on.</p>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea 
+                                class="chat-input" 
+                                placeholder="Ask about violin techniques..."
+                                rows="1"
+                                aria-label="Chat message input field"
+                            ></textarea>
+                            <button class="chat-send-btn" onclick="sendChatMessage()" title="Send message">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Restore Buttons -->
+        <button class="restore-btn left" id="leftRestoreBtn" onclick="toggleSidebar('left')" style="display: none;">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <button class="restore-btn right" id="rightRestoreBtn" onclick="toggleSidebar('right')" style="display: none;">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <!-- Selection Counter -->
+        <div class="selection-counter" id="selectionCounter">
+            <span id="selectionText">0/3 techniques selected</span>
+        </div>
+    </div>
+
+    <script>
+        let originalMainContentHTML = '';
+        let isPreviewActive = false;
+        let hoverTimeout = null; // To manage quick hovers
+        let selectedTechniquesBeforePreview = []; // To store actual selections during preview
+        let isViewingSheet = false;
+        let mainContentBeforeView = '';
+
+        // Comprehensive technique database (Categorized)
+        const techniqueDatabase = {
+            "Scales & Arpeggios": [
+                "Major Scales (One Octave)",
+                "Minor Scales (One Octave)",
+                "Major Arpeggios (One Octave)",
+                "Chromatic Scale (One Octave)",
+                "Two Octave Major Scales",
+                "Scales in Thirds"
+            ],
+            "Bowing Techniques": [
+                "Detache",
+                "Legato",
+                "Staccato",
+                "Spiccato",
+                "Martelé",
+                "Ricochet"
+            ],
+            "Left Hand Techniques": [
+                "Finger Dexterity",
+                "Shifting (Positions 1-3)",
+                "Vibrato (Introduction)",
+                "Double Stops (Basic)",
+                "Trills",
+                "Pizzicato (Left Hand)"
+            ],
+            "Rhythm & Timing": [
+                "Basic Rhythms (Quarter, Half, Whole)",
+                "Dotted Rhythms",
+                "Syncopation (Simple)",
+                "Tuplets (Triplets)",
+                "Metronome Practice"
+            ],
+            "Musicality & Expression": [
+                "Dynamics (p, mf, f)",
+                "Phrasing (Simple Melodies)",
+                "Articulation Accents",
+                "Basic Music Theory (Key Signatures)"
+            ]
+        };
+
+        // Flattened database with descriptions for preview
+        const techniqueDatabaseFlat = [
+            { name: "Major Scales (One Octave)", category: "Scales & Arpeggios", description: "Playing major scales through one octave helps develop finger patterns and intonation." },
+            { name: "Minor Scales (One Octave)", category: "Scales & Arpeggios", description: "Minor scales introduce different tonal colors and fingerings." },
+            { name: "Major Arpeggios (One Octave)", category: "Scales & Arpeggios", description: "Arpeggios outline chords and are crucial for understanding harmony and improving string crossing." },
+            { name: "Chromatic Scale (One Octave)", category: "Scales & Arpeggios", description: "The chromatic scale uses all semitones and is excellent for finger precision and ear training." },
+            { name: "Two Octave Major Scales", category: "Scales & Arpeggios", description: "Extending scales to two octaves requires shifting and consistent tone production across a wider range." },
+            { name: "Scales in Thirds", category: "Scales & Arpeggios", description: "Playing scales in thirds enhances finger coordination and harmonic understanding." },
+            { name: "Detache", category: "Bowing Techniques", description: "A fundamental bowing technique involving separate, smooth bow strokes for each note." },
+            { name: "Legato", category: "Bowing Techniques", description: "Connecting multiple notes smoothly in a single bow stroke." },
+            { name: "Staccato", category: "Bowing Techniques", description: "Short, detached bow strokes, creating separation between notes." },
+            { name: "Spiccato", category: "Bowing Techniques", description: "A bouncing bow stroke where the bow naturally lifts off the string between notes." },
+            { name: "Martelé", category: "Bowing Techniques", description: "A 'hammered' stroke with a sharp attack and clear separation." },
+            { name: "Ricochet", category: "Bowing Techniques", description: "A series of rapid, bouncing notes performed in a single down or up bow." },
+            { name: "Finger Dexterity", category: "Left Hand Techniques", description: "Exercises to improve the speed, accuracy, and independence of the left-hand fingers." },
+            { name: "Shifting (Positions 1-3)", category: "Left Hand Techniques", description: "Moving the left hand smoothly between different positions on the fingerboard." },
+            { name: "Vibrato (Introduction)", category: "Left Hand Techniques", description: "A subtle oscillation in pitch to add warmth and expressiveness to the tone." },
+            { name: "Double Stops (Basic)", category: "Left Hand Techniques", description: "Playing two notes simultaneously on adjacent strings." },
+            { name: "Trills", category: "Left Hand Techniques", description: "Rapid alternation between two adjacent notes." },
+            { name: "Pizzicato (Left Hand)", category: "Left Hand Techniques", description: "Plucking the strings with the left-hand fingers, often used for special effects." },
+            { name: "Basic Rhythms (Quarter, Half, Whole)", category: "Rhythm & Timing", description: "Understanding and accurately playing fundamental note durations." },
+            { name: "Dotted Rhythms", category: "Rhythm & Timing", description: "Rhythms involving notes extended by half their value, creating a characteristic long-short pattern." },
+            { name: "Syncopation (Simple)", category: "Rhythm & Timing", description: "Playing notes off the main beat, creating rhythmic interest." },
+            { name: "Tuplets (Triplets)", category: "Rhythm & Timing", description: "Dividing a beat into a different number of equal parts, such as three notes in the space of two." },
+            { name: "Metronome Practice", category: "Rhythm & Timing", description: "Using a metronome to develop a steady sense of time and rhythmic precision." },
+            { name: "Dynamics (p, mf, f)", category: "Musicality & Expression", description: "Controlling the loudness and softness of the music (piano, mezzo-forte, forte)." },
+            { name: "Phrasing (Simple Melodies)", category: "Musicality & Expression", description: "Shaping musical sentences to create a coherent and expressive performance." },
+            { name: "Articulation Accents", category: "Musicality & Expression", description: "Emphasizing certain notes to give them prominence or a specific character." },
+            { name: "Basic Music Theory (Key Signatures)", category: "Musicality & Expression", description: "Understanding how key signatures indicate the sharps or flats to be played throughout a piece." }
+        ];
+
+        // Sheet music database
+        const sheetMusicDatabase = {
+            'Legato': [
+                { title: 'Kreutzer Etude No. 2', composer: 'R. Kreutzer', difficulty: 'Intermediate' },
+                { title: 'Wohlfahrt Op. 45 No. 15', composer: 'F. Wohlfahrt', difficulty: 'Beginner' },
+                { title: 'Sevcik Op. 1 Part 1', composer: 'O. Sevcik', difficulty: 'Advanced' }
+            ],
+            'Staccato': [
+                { title: 'Kreutzer Etude No. 4', composer: 'R. Kreutzer', difficulty: 'Advanced' },
+                { title: 'Mazas Op. 36 No. 12', composer: 'J. Mazas', difficulty: 'Intermediate' },
+                { title: 'Dont Op. 37 No. 8', composer: 'J. Dont', difficulty: 'Advanced' }
+            ],
+            'Spiccato': [
+                { title: 'Kreutzer Etude No. 9', composer: 'R. Kreutzer', difficulty: 'Advanced' },
+                { title: 'Fiorillo No. 25', composer: 'F. Fiorillo', difficulty: 'Professional' },
+                { title: 'Rode Caprice No. 6', composer: 'P. Rode', difficulty: 'Virtuoso' }
+            ],
+            'Scales': [
+                { title: 'Hrimaly Scale Studies', composer: 'J. Hrimaly', difficulty: 'Intermediate' },
+                { title: 'Flesch Scale System', composer: 'C. Flesch', difficulty: 'Advanced' },
+                { title: 'Galamian Scale Studies', composer: 'I. Galamian', difficulty: 'Professional' }
+            ],
+            'Shifting': [
+                { title: 'Sevcik Op. 8', composer: 'O. Sevcik', difficulty: 'Intermediate' },
+                { title: 'Schradieck Position Studies', composer: 'H. Schradieck', difficulty: 'Advanced' },
+                { title: 'Kreutzer Etude No. 8', composer: 'R. Kreutzer', difficulty: 'Advanced' }
+            ]
+        };
+
+        // Global state
+        let selectedTechniques = [];
+        let currentConversationId = null;
+        let conversations = {};
+        let inDepthMode = false;
+
+        // Auto-resize textarea
+        function autoResize(textarea) {
+    // Reset height first to accurately calculate new height
+    textarea.style.height = 'auto';
+    
+    // Calculate new height based on content
+    const newHeight = Math.min(textarea.scrollHeight, 120); // Cap at max-height
+    textarea.style.height = newHeight + 'px';
+    
+    // Apply different styles based on content length
+    const chatInputWrapper = textarea.closest('.chat-input-wrapper');
+    if (chatInputWrapper) {
+        if (newHeight > 60) {
+            chatInputWrapper.classList.add('expanded');
+        } else {
+            chatInputWrapper.classList.remove('expanded');
+        }
+    }
+}
+
+        function previewTechniqueContent(techniqueName) {
+            // Disable hover previews if a sheet is currently open
+            if (isViewingSheet) {
+                return;
+            }
+            // If a preview is NOT YET active, check the *current* selectedTechniques (which are persistent user selections).
+            // If it has items, don't start a new preview.
+            if (!isPreviewActive && selectedTechniques.length > 0) {
+                return; 
+            }
+
+            const mainContent = document.getElementById('mainContent');
+            if (!mainContent) return;
+
+            if (!isPreviewActive) { // Only save state if starting a new preview sequence
+                originalMainContentHTML = mainContent.innerHTML;
+                // At this point, if we passed the check above, selectedTechniques was empty when this function was called.
+                // So selectedTechniquesBeforePreview will correctly be empty (or reflect the true state if the logic evolves).
+                selectedTechniquesBeforePreview = [...selectedTechniques]; 
+            }
+            
+            // If we are here, it's either:
+            // 1. No persistent selections existed (and !isPreviewActive, so selectedTechniques.length was 0 initially)
+            // 2. A preview is already active (isPreviewActive was true), so we're just switching the preview content.
+            selectedTechniques = [techniqueName]; // Temporarily set to the technique being previewed
+            updateMainContent(); // This will now use the fade effect
+            
+            isPreviewActive = true;
+        }
+
+        function clearTechniquePreview() {
+            if (isPreviewActive) {
+                const mainContent = document.getElementById('mainContent'); // Get mainContent inside the if block
+                if (!mainContent) { // Check if mainContent exists
+                    isPreviewActive = false; // Still reset flag if mainContent somehow missing
+                    return;
+                }
+
+                selectedTechniques = [...selectedTechniquesBeforePreview]; // Restore actual selections first
+
+                // Use the fade helper to restore the original content
+                _updateMainContentWithFade(() => {
+                    mainContent.innerHTML = originalMainContentHTML;
+                });
+                
+                isPreviewActive = false;
+            }
+        }
+
+        // Helper function to manage fade-out, content update, and fade-in
+        function _updateMainContentWithFade(updateCallback) {
+            const mainContent = document.getElementById('mainContent'); // This IS .content-body
+            if (!mainContent) return;
+
+            // Start fade-out
+            mainContent.classList.add('fade-out');
+
+            setTimeout(() => {
+                // Update the content
+                if (updateCallback) {
+                    updateCallback(); // This changes mainContent.innerHTML
+                }
+
+                // Prepare for fade-in:
+                // 1. Make the new content transparent (it currently has no 'fade-out' class but might be visible)
+                mainContent.style.opacity = '0'; 
+                
+                // 2. Remove 'fade-out' class (which might have been on the old, now-gone content's representation)
+                //    and ensure the base styles for transition are active.
+                mainContent.classList.remove('fade-out'); 
+
+                // 3. Force a reflow. This is a common trick to ensure the browser processes the style changes
+                //    before applying the next ones, allowing the transition to trigger correctly.
+                void mainContent.offsetHeight; // Reading an offsetHeight is a common way to trigger reflow
+
+                // 4. Trigger the fade-in by setting opacity to 1. The CSS transition on .content-body will handle it.
+                mainContent.style.opacity = '1';
+
+            }, 300); // Match CSS transition duration for fade-out
+        }
+
+        function updateMainContent() {
+            _updateMainContentWithFade(() => {
+                const mainContent = document.getElementById('mainContent');
+                if (!mainContent) return;
+
+                if (selectedTechniques.length === 0) {
+                    mainContent.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-music"></i>
+                            <h3>Welcome to Arco</h3>
+                            <p>Search for techniques or select from the sidebar to get started with your practice session.</p>
+                        </div>
+                    `;
+                } else {
+                    let resultingSheets = [];
+
+                    if (selectedTechniques.length > 0) {
+                        // Get sheets for the first selected technique
+                        const firstTechnique = selectedTechniques[0];
+                        resultingSheets = sheetMusicDatabase[firstTechnique] || [
+                            { title: `${firstTechnique} Study No. 1`, composer: 'Various', difficulty: 'Intermediate', tags: [firstTechnique] },
+                            { title: `${firstTechnique} Exercise`, composer: 'Technical Studies', difficulty: 'Advanced', tags: [firstTechnique] },
+                            { title: `${firstTechnique} Etude`, composer: 'Method Books', difficulty: 'Beginner', tags: [firstTechnique] }
+                        ];
+
+                        // If multiple techniques are selected, filter by intersection
+                        if (selectedTechniques.length > 1) {
+                            for (let i = 1; i < selectedTechniques.length; i++) {
+                                const currentTechnique = selectedTechniques[i];
+                                const currentTechniqueSheets = sheetMusicDatabase[currentTechnique] || [
+                                    { title: `${currentTechnique} Study No. 1`, composer: 'Various', difficulty: 'Intermediate', tags: [currentTechnique] },
+                                    { title: `${currentTechnique} Exercise`, composer: 'Technical Studies', difficulty: 'Advanced', tags: [currentTechnique] },
+                                    { title: `${currentTechnique} Etude`, composer: 'Method Books', difficulty: 'Beginner', tags: [currentTechnique] }
+                                ];
+                                
+                                // Assuming sheet titles are unique identifiers for comparison
+                                const currentTechniqueSheetTitles = new Set(currentTechniqueSheets.map(sheet => sheet.title));
+                                resultingSheets = resultingSheets.filter(sheet => currentTechniqueSheetTitles.has(sheet.title));
+                            }
+                        }
+                    }
+
+                    if (resultingSheets.length === 0) {
+                        mainContent.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h3>No Results</h3>
+                                <p>No sheet music found matching all selected techniques. Try a different combination.</p>
+                            </div>
+                        `;
+                    } else {
+                        mainContent.innerHTML = `
+                            <div class="sheet-music-grid">
+                                ${resultingSheets.map((sheet, index) => `
+                                    <div class="sheet-item" onclick="viewSheetMusic('${sheet.title}', '${sheet.composer}')">
+                                        <div class="sheet-thumbnail">
+                                            <img src="public/images/rode-01.png" alt="${sheet.title} thumbnail">
+                                        </div>
+                                        <div class="sheet-info">
+                                            <div class="sheet-title">${sheet.title}</div>
+                                            <div class="sheet-composer">${sheet.composer}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                }
+            });
+        }
+
+        function viewSheetMusic(title, composer) {
+            const mainContent = document.getElementById('mainContent');
+            mainContentBeforeView = mainContent.innerHTML;
+            isViewingSheet = true;
+
+            mainContent.innerHTML = `
+                <div class="sheet-viewer">
+                    <div style="text-align:center; margin-bottom:0.75rem;">
+                        <span style="font-size:1.1rem; font-weight:500; color:var(--md-sys-color-on-surface);">${title}</span>
+                        <span style="margin-left:0.5rem; color:var(--md-sys-color-on-surface-variant); font-size:0.875rem;">by ${composer}</span>
+                    </div>
+                    <div class="sheet-display">
+                        <div class="pdf-toolbar">
+                            <div class="pdf-controls-group">
+                                <div id="page-controls">
+                                    <button id="prev-page" class="pdf-control-btn"><i class="fas fa-chevron-left"></i></button>
+                                    <span id="page-num">1</span> / <span id="page-count">1</span>
+                                    <button id="next-page" class="pdf-control-btn"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="pdf-controls-group">
+                                <button id="zoom-in" class="pdf-control-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                                <button id="zoom-out" class="pdf-control-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                                <button id="pdf-download" class="pdf-control-btn" title="Download" onclick="window.open('public/images/rode-01.pdf', '_blank')"><i class="fas fa-download"></i></button>
+                            </div>
+                        </div>
+                        <div id="pdf-container">
+                            <canvas id="pdf-canvas"></canvas>
+                        </div>
+                    </div>
+                    <!-- Bottom controls removed in favor of toolbar -->
+                </div>
+            `;
+            
+            // Initialize PDF rendering with PDF.js
+            initPDFViewer('public/images/rode-01.pdf');
+            document.getElementById('topBackBtn').style.display = 'inline-flex';
+        }
+
+        // PDF.js viewer initialization
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            scale = 1.25;
+
+        function initPDFViewer(url) {
+            // Reset state in case the viewer was previously used
+            pageNum = 1;
+            scale = 1.25;
+            
+            // Load the PDF
+            pdfjsLib.getDocument(url).promise.then(function(pdf) {
+                pdfDoc = pdf;
+                document.getElementById('page-count').textContent = pdf.numPages;
+                
+                // Initial/first page rendering
+                renderPage(pageNum);
+                
+                // Setup pagination controls
+                document.getElementById('prev-page').addEventListener('click', onPrevPage);
+                document.getElementById('next-page').addEventListener('click', onNextPage);
+                
+                // Setup zoom controls
+                document.getElementById('zoom-in').addEventListener('click', function() {
+                    scale += 0.25;
+                    renderPage(pageNum);
+                });
+                
+                document.getElementById('zoom-out').addEventListener('click', function() {
+                    if (scale > 0.5) {
+                        scale -= 0.25;
+                        renderPage(pageNum);
+                    }
+                });
+                
+                // Setup keyboard navigation
+                document.addEventListener('keydown', pdfKeyboardHandler);
+            }).catch(function(error) {
+                console.error('Error loading PDF:', error);
+                document.getElementById('pdf-container').innerHTML = `
+                    <div style="padding: 2rem; text-align: center;">
+                        <p>Unable to load PDF. Please try again later.</p>
+                        <a href="${url}" target="_blank" class="control-btn">Download PDF</a>
+                    </div>
+                `;
+            });
+        }
+
+        function renderPage(num) {
+            pageRendering = true;
+            
+            // Show loading indicator
+            const pdfContainer = document.getElementById('pdf-container');
+            const existingCanvas = document.getElementById('pdf-canvas');
+            
+            // Add loading state
+            pdfContainer.style.position = 'relative';
+            let loadingIndicator = document.getElementById('pdf-loading');
+            if (!loadingIndicator) {
+                loadingIndicator = document.createElement('div');
+                loadingIndicator.id = 'pdf-loading';
+                loadingIndicator.style.position = 'absolute';
+                loadingIndicator.style.top = '50%';
+                loadingIndicator.style.left = '50%';
+                loadingIndicator.style.transform = 'translate(-50%, -50%)';
+                loadingIndicator.style.background = 'rgba(0,0,0,0.7)';
+                loadingIndicator.style.color = 'white';
+                loadingIndicator.style.padding = '10px 20px';
+                loadingIndicator.style.borderRadius = '4px';
+                loadingIndicator.style.zIndex = '1000';
+                loadingIndicator.textContent = 'Loading page...';
+                pdfContainer.appendChild(loadingIndicator);
+            } else {
+                loadingIndicator.style.display = 'block';
+            }
+            
+            // Using promise to fetch the page
+            pdfDoc.getPage(num).then(function(page) {
+                // Calculate the optimal scale for viewing - adjust to fit width
+                const pdfContainerWidth = pdfContainer.clientWidth - 40; // 40px for padding
+                const rawViewport = page.getViewport({scale: 1});
+                const widthScale = pdfContainerWidth / rawViewport.width;
+                const adjustedScale = scale * widthScale;
+                
+                const viewport = page.getViewport({scale: adjustedScale});
+                const canvas = document.getElementById('pdf-canvas');
+                const context = canvas.getContext('2d');
+                
+                // Set canvas dimensions
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Render PDF page into canvas context
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                const renderTask = page.render(renderContext);
+                
+                // Wait for rendering to finish
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                    
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                }).catch(function(error) {
+                    console.error('Error rendering PDF page:', error);
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                    pageRendering = false;
+                });
+            }).catch(function(error) {
+                console.error('Error getting PDF page:', error);
+                if (loadingIndicator) loadingIndicator.style.display = 'none';
+                pageRendering = false;
+            });
+            
+            // Update page counters
+            document.getElementById('page-num').textContent = num;
+        }
+        
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+
+        function exitSheetView() {
+            const mainContent = document.getElementById('mainContent');
+            if (mainContentBeforeView) {
+                mainContent.innerHTML = mainContentBeforeView;
+                isViewingSheet = false;
+                
+                // Remove PDF-specific keyboard listeners when exiting the view
+                // (they will be reattached when entering the view again)
+                document.removeEventListener('keydown', pdfKeyboardHandler);
+                document.getElementById('topBackBtn').style.display = 'none';
+            } else {
+                // Fallback: regenerate content
+                updateMainContent();
+                isViewingSheet = false;
+            }
+        }
+
+        // Separated keyboard handler for PDF viewing
+        function pdfKeyboardHandler(e) {
+            if (!isViewingSheet) return;
+            
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+                onNextPage();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                onPrevPage();
+            } else if (e.key === '+') {
+                if (scale < 3) {
+                    scale += 0.25;
+                    renderPage(pageNum);
+                }
+            } else if (e.key === '-') {
+                if (scale > 0.5) {
+                    scale -= 0.25;
+                    renderPage(pageNum);
+                }
+            } else if (e.key === 'h' || e.key === '?') {
+                // Show keyboard shortcuts help
+                const helpElement = document.getElementById('pdf-shortcuts-help');
+                if (helpElement) {
+                    helpElement.style.display = helpElement.style.display === 'none' ? 'flex' : 'none';
+                } else {
+                    const helpDiv = document.createElement('div');
+                    helpDiv.id = 'pdf-shortcuts-help';
+                    helpDiv.style.position = 'absolute';
+                    helpDiv.style.top = '50%';
+                    helpDiv.style.left = '50%';
+                    helpDiv.style.transform = 'translate(-50%, -50%)';
+                    helpDiv.style.background = 'var(--md-sys-color-surface-container-high)';
+                    helpDiv.style.color = 'var(--md-sys-color-on-surface)';
+                    helpDiv.style.padding = '20px';
+                    helpDiv.style.borderRadius = '8px';
+                    helpDiv.style.zIndex = '2000';
+                    helpDiv.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+                    helpDiv.style.display = 'flex';
+                    helpDiv.style.flexDirection = 'column';
+                    helpDiv.style.gap = '10px';
+                    helpDiv.style.maxWidth = '400px';
+                    
+                    helpDiv.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="margin:0;">Keyboard Shortcuts</h3>
+                            <button onclick="this.parentElement.parentElement.style.display='none'" 
+                                style="background:none; border:none; cursor:pointer; color:var(--md-sys-color-on-surface);">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <hr style="border-color:var(--md-sys-color-outline-variant); margin:0;">
+                        <div style="display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;">
+                            <span><kbd>←</kbd> or <kbd>PageUp</kbd></span>
+                            <span>Previous page</span>
+                            <span><kbd>→</kbd> or <kbd>PageDown</kbd></span>
+                            <span>Next page</span>
+                            <span><kbd>+</kbd></span>
+                            <span>Zoom in</span>
+                            <span><kbd>-</kbd></span>
+                            <span>Zoom out</span>
+                            <span><kbd>h</kbd> or <kbd>?</kbd></span>
+                            <span>Show/hide this help</span>
+                        </div>
+                    `;
+                    
+                    document.getElementById('pdf-container').appendChild(helpDiv);
+                }
+            }
+        }
+
+        function toggleTechniqueSelection(element, technique) {
+            // If currently viewing a sheet, exit first so content refreshes properly
+            if (isViewingSheet) {
+                exitSheetView();
+            }
+            console.log(`[TOGGLE] Clicked: ${technique}, isPreviewActive: ${isPreviewActive}`);
+            console.log('[TOGGLE] Before:', JSON.stringify(selectedTechniques), element.classList.contains('selected'));
+
+            if (selectedTechniques.includes(technique)) {
+                console.log('[TOGGLE] Deselecting...');
+                selectedTechniques = selectedTechniques.filter(t => t !== technique);
+                element.classList.remove('selected');
+            } else {
+                console.log('[TOGGLE] Selecting...');
+                if (selectedTechniques.length < 3) {
+                    selectedTechniques.push(technique);
+                    element.classList.add('selected');
+                } else {
+                    console.log('[TOGGLE] Max selection reached.');
+                    showTemporaryMessage('Maximum 3 techniques can be selected');
+                    return;
+                }
+            }
+            
+            console.log('[TOGGLE] After:', JSON.stringify(selectedTechniques), element.classList.contains('selected'));
+            updateSelectionCounter();
+            console.log('[TOGGLE] Calling updateMainContent...');
+            updateMainContent();
+            console.log('[TOGGLE] updateMainContent call finished.');
+        }
+
+        function updateSelectionCounter() {
+            const counter = document.getElementById('selectionCounter');
+            const text = document.getElementById('selectionText');
+            
+            text.textContent = `${selectedTechniques.length}/3 techniques selected`;
+            
+            if (selectedTechniques.length > 0) {
+                counter.classList.add('visible');
+            } else {
+                counter.classList.remove('visible');
+            }
+        }
+
+        // Function definitions previously here were corrupted or deleted. Restoring them.
+
+        function populateTechniques() {
+            const container = document.getElementById('techniqueContainer');
+            container.innerHTML = '';
+
+            Object.entries(techniqueDatabase).forEach(([section, techniques]) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'technique-section';
+                
+                const title = document.createElement('div');
+                title.className = 'section-title';
+                title.textContent = section;
+                
+                const tagsDiv = document.createElement('div');
+                tagsDiv.className = 'technique-tags';
+                
+                techniques.forEach(technique => {
+                    const tag = document.createElement('div');
+                    tag.className = 'technique-tag';
+                    tag.textContent = technique;
+                    tag.dataset.technique = technique;
+                    tag.addEventListener('click', () => {
+                        if (isPreviewActive) {
+                            selectedTechniques = [...selectedTechniquesBeforePreview];
+                            isPreviewActive = false; 
+                        }
+                        toggleTechniqueSelection(tag, technique);
+                    });
+                    tag.addEventListener('mouseover', () => {
+                        clearTimeout(hoverTimeout); 
+                        previewTechniqueContent(technique);
+                    });
+                    tagsDiv.appendChild(tag);
+                });
+                
+                sectionDiv.appendChild(title);
+                sectionDiv.appendChild(tagsDiv);
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        function filterTechniques(searchQuery) { 
+            const container = document.getElementById('techniqueContainer');
+            container.innerHTML = '';
+            let allTechniquesWithCategory = [];
+            Object.entries(techniqueDatabase).forEach(([category, techniques]) => {
+                techniques.forEach(techniqueName => {
+                    allTechniquesWithCategory.push({ name: techniqueName, category: category });
+                });
+            });
+            allTechniquesWithCategory.sort(() => 0.5 - Math.random());
+            const numberOfTechniquesToShow = Math.floor(Math.random() * 5) + 3; 
+            const randomTechniques = allTechniquesWithCategory.slice(0, numberOfTechniquesToShow);
+            const techniquesBySection = {};
+            randomTechniques.forEach(technique => {
+                if (!techniquesBySection[technique.category]) {
+                    techniquesBySection[technique.category] = [];
+                }
+                techniquesBySection[technique.category].push(technique.name);
+            });
+            Object.entries(techniquesBySection).forEach(([sectionName, techniqueNames]) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'technique-section';
+                const title = document.createElement('div');
+                title.className = 'section-title';
+                title.textContent = sectionName;
+                const tagsDiv = document.createElement('div');
+                tagsDiv.className = 'technique-tags';
+                techniqueNames.forEach(technique => {
+                    const tag = document.createElement('div');
+                    tag.className = 'technique-tag';
+                    tag.textContent = technique;
+                    tag.dataset.technique = technique;
+                    tag.addEventListener('click', () => {
+                        if (isPreviewActive) {
+                            selectedTechniques = [...selectedTechniquesBeforePreview];
+                            isPreviewActive = false; 
+                        }
+                        toggleTechniqueSelection(tag, technique);
+                    });
+                    tag.addEventListener('mouseover', () => {
+                        clearTimeout(hoverTimeout); 
+                        previewTechniqueContent(technique);
+                    });
+                    tagsDiv.appendChild(tag);
+                });
+                sectionDiv.appendChild(title);
+                sectionDiv.appendChild(tagsDiv);
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        function updateChatSendButton() {
+            const chatInput = document.querySelector('.chat-input');
+            const chatSendBtn = document.querySelector('.chat-send-btn');
+            
+            if (chatInput && chatSendBtn) {
+                if (chatInput.value.trim() !== '') {
+                    chatSendBtn.classList.add('active');
+                    chatSendBtn.classList.add('pulse');
+                    setTimeout(() => chatSendBtn.classList.remove('pulse'), 600);
+                } else {
+                    chatSendBtn.classList.remove('active');
+                }
+            }
+        }
+
+        function simulateAIResponse(query, conversationId) {
+            if (currentConversationId !== conversationId) return;
+
+            showTypingIndicator();
+            setTimeout(() => {
+                if (currentConversationId !== conversationId) {
+                    hideTypingIndicator(); 
+                    return;
+                }
+                hideTypingIndicator();
+                const response = generateInitialAIResponse(query); 
+                addMessage('assistant', response, true); 
+            }, 1500); 
+        }
+
+        function startNewConversation(query) {
+            currentConversationId = Date.now().toString();
+            conversations[currentConversationId] = [];
+            inDepthMode = false;
+            
+            addMessage('user', query);
+            
+            if (query) simulateAIResponse(query, currentConversationId);
+        }
+
+        function performSearch(isResetAction = false) { 
+            const searchInput = document.querySelector('.search-input');
+            const query = searchInput.value.trim().toLowerCase();
+            const resetBtn = document.getElementById('resetSearchBtn');
+
+            clearTechniquePreview(); 
+
+            const allTechniqueTagsBeforeFilter = document.querySelectorAll('.technique-tag');
+            allTechniqueTagsBeforeFilter.forEach(tag => tag.classList.remove('selected'));
+            selectedTechniques = [];
+
+            if (!query) {
+                populateTechniques(); 
+                updateSelectionCounter();
+                updateMainContent(); 
+                if (!isResetAction) { // Only start new conversation if it's NOT a reset action from 'X' button
+                    startNewConversation(''); 
+                }
+                if (resetBtn) resetBtn.style.display = 'none'; // Ensure reset button is hidden
+                return;
+            }
+
+            // If there is a query, ensure reset button is visible (it should be if input has text)
+            if (resetBtn && searchInput.value) resetBtn.style.display = 'block';
+
+            filterTechniques(query); 
+            updateSelectionCounter(); 
+            updateMainContent();    
+            startNewConversation(query); // This is for actual search queries with content
+        }
+
+        function setupEventListeners() { 
+            const searchInput = document.querySelector('.search-input'); 
+            const resetSearchBtn = document.getElementById('resetSearchBtn'); // New reset button
+            const chatInput = document.querySelector('.chat-input');
+            const chatSendBtn = document.querySelector('.chat-send-btn');
+            const aiChatSidebar = document.getElementById('aiChatSidebar');
+            const minimizeChatBtn = document.getElementById('minimizeChat');
+            const restoreChatBtn = document.getElementById('restoreChatBtn');
+            const chatHistoryBtn = document.getElementById('chatHistoryBtn');
+            // const inDepthAnalysisBtn = document.querySelector('.in-depth-btn'); // This button is dynamically added
+
+            if (searchInput) { 
+                searchInput.addEventListener('input', function() {
+                    // Show reset button if there is text, hide otherwise
+                    if (resetSearchBtn) resetSearchBtn.style.display = this.value.trim() ? 'block' : 'none';
+                });
+
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); 
+                        performSearch(); // isResetAction will be false by default
+                    }
+                });
+            }
+
+            if (resetSearchBtn) { 
+                resetSearchBtn.onclick = () => {
+                    searchInput.value = '';
+                    performSearch(true); // Pass true to indicate it's a reset action from 'X' button
+                    resetSearchBtn.style.display = 'none'; // Explicitly hide after click
+                    searchInput.focus(); // Set focus back to search input
+                };
+            }
+
+            // Event listeners for chat functionality (remains largely the same)
+            if (chatInput) {
+                autoResize(chatInput); 
+                chatInput.addEventListener('input', function() {
+                    autoResize(this);
+                    updateChatSendButton();
+                });
+                chatInput.addEventListener('focus', function() {
+                    this.closest('.chat-input-wrapper').classList.add('focused');
+                });
+                chatInput.addEventListener('blur', function() {
+                    this.closest('.chat-input-wrapper').classList.remove('focused');
+                });
+                chatInput.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        const btn = document.querySelector('.chat-send-btn');
+                        if (btn.classList.contains('active')) {
+                            btn.classList.add('sending');
+                            setTimeout(() => btn.classList.remove('sending'), 300);
+                            sendChatMessage();
+                        } else {
+                            this.closest('.chat-input-wrapper').classList.add('shake');
+                            setTimeout(() => this.closest('.chat-input-wrapper').classList.remove('shake'), 400);
+                        }
+                    }
+                });
+            }
+
+            if (chatSendBtn) {
+                chatSendBtn.onclick = () => sendChatMessage();
+            }
+
+            if (minimizeChatBtn) {
+                minimizeChatBtn.onclick = () => toggleSidebar('right');
+            }
+            if (restoreChatBtn) {
+                restoreChatBtn.onclick = () => toggleSidebar('right');
+            }
+            if (chatHistoryBtn) {
+                chatHistoryBtn.onclick = () => toggleChatHistory();
+            }
+            // The inDepthAnalysisBtn event listener is added when the button is created in addMessage
+
+            updateChatSendButton();
+            // updateMainContent(); // Not needed here, performSearch or populateTechniques will handle it.
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) {
+                originalMainContentHTML = mainContent.innerHTML; 
+            }
+            populateTechniques(); 
+
+            const techniqueContainer = document.getElementById('techniqueContainer');
+            if (techniqueContainer) {
+                techniqueContainer.addEventListener('mouseleave', () => {
+                    if (selectedTechniques.length === 0 && !isPreviewActive) { 
+                         clearTechniquePreview(); 
+                    }
+                });
+            }
+            setupEventListeners(); 
+        });
+
+        function generateInitialAIResponse(query) {
+            // Generate contextual advice based on the query
+            const lowerQuery = query.toLowerCase();
+            let advice = '';
+            
+            if (lowerQuery.includes('bowing') || lowerQuery.includes('bow')) {
+                advice = 'For bowing technique development, focus on straight bow movement and consistent contact point. Start with long, slow bows to establish muscle memory.';
+            } else if (lowerQuery.includes('shift') || lowerQuery.includes('position')) {
+                advice = 'Position shifting requires precise finger placement and smooth thumb movement. Practice scales with marked position changes to build confidence.';
+            } else if (lowerQuery.includes('vibrato')) {
+                advice = 'Vibrato should be developed gradually, starting with arm vibrato before progressing to wrist and finger vibrato. Keep the motion relaxed and consistent.';
+            } else if (lowerQuery.includes('scale') || lowerQuery.includes('arpeggio')) {
+                advice = 'Scale practice is fundamental for intonation and finger independence. Use a metronome and practice in different rhythmic patterns.';
+            } else if (lowerQuery.includes('staccato') || lowerQuery.includes('spiccato')) {
+                advice = 'Articulated bowing techniques require precise bow control and timing. Start slowly and gradually increase tempo while maintaining clarity.';
+            } else if (lowerQuery.includes('double stops') || lowerQuery.includes('harmony')) {
+                advice = 'Double stops require careful intonation and bow distribution. Practice each interval separately before combining them.';
+            } else if (lowerQuery.includes('trill') || lowerQuery.includes('ornament')) {
+                advice = 'Ornaments should enhance the musical line. Start trills slowly and gradually increase speed while maintaining evenness.';
+            } else {
+                advice = 'Focus on fundamentals: posture, bow hold, and left hand position. Consistent daily practice with attention to detail will yield the best results.';
+            }
+            
+            return advice;
+        }
+
+        function addMessage(sender, content, isInitial = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Remove empty state if present
+            const emptyState = messagesContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            
+            let messageHTML = `
+                <div class="message-bubble">${content}</div>
+                <div class="message-time">${timeStr}</div>
+            `;
+            
+            if (isInitial && sender === 'assistant') {
+                messageHTML += `
+                    <button class="in-depth-btn" onclick="requestInDepthAnalysis()">
+                        <i class="fas fa-brain"></i>
+                        Get In-Depth Analysis
+                    </button>
+                `;
+            }
+            
+            messageDiv.innerHTML = messageHTML;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Store in conversation
+            if (conversations[currentConversationId]) {
+                conversations[currentConversationId].push({
+                    sender,
+                    content,
+                    timestamp: now,
+                    isInitial
+                });
+            }
+        }
+
+        function requestInDepthAnalysis() {
+            inDepthMode = true;
+            
+            // Remove the in-depth button
+            const inDepthBtn = document.querySelector('.in-depth-btn');
+            if (inDepthBtn) {
+                inDepthBtn.remove();
+            }
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate detailed AI response
+            setTimeout(() => {
+                hideTypingIndicator();
+                const detailedResponse = generateInDepthResponse();
+                addMessage('assistant', detailedResponse);
+                
+                // Enable chat input for continued conversation
+                enableChatInput();
+            }, 2000);
+        }
+
+        function generateInDepthResponse() {
+            return `Here's a comprehensive analysis of your practice focus:
+
+**Technical Foundation:**
+- Establish proper posture and bow hold before advancing to complex techniques
+- Use a mirror to monitor your form and bow path
+- Record yourself playing to identify areas for improvement
+
+**Practice Strategy:**
+- Start with slow, deliberate movements to build muscle memory
+- Use a metronome to ensure rhythmic accuracy
+- Break complex passages into smaller, manageable segments
+
+**Progressive Development:**
+- Begin with foundational exercises before attempting advanced repertoire
+- Gradually increase tempo only after achieving technical accuracy
+- Focus on one technical aspect at a time to avoid overwhelming your practice
+
+Would you like specific exercises for any particular technique? I can provide detailed practice routines tailored to your current level.`;
+        }
+
+        function enableChatInput() {
+            const chatInput = document.querySelector('.chat-input');
+            chatInput.placeholder = 'Continue the conversation...';
+            chatInput.disabled = false;
+        }
+
+        function sendChatMessage() {
+            const chatInput = document.querySelector('.chat-input');
+            const message = chatInput.value.trim();
+            
+            if (!message || !currentConversationId) return;
+            
+            // Add user message
+            addMessage('user', message);
+            
+            // Clear input and update UI
+            chatInput.value = '';
+            autoResize(chatInput);
+            updateChatSendButton();
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate AI response with variable timing based on message length
+            const responseDelay = 800 + Math.min(message.length * 20, 1500) + (Math.random() * 800);
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = generateChatResponse(message);
+                addMessage('assistant', response);
+            }, responseDelay);
+        }
+
+        function generateChatResponse(message) {
+            const responses = [
+                "That's a great question! For that technique, I recommend starting with basic finger exercises to build strength and independence.",
+                "Excellent point! Try practicing that passage in different rhythmic patterns to improve your timing and coordination.",
+                "I suggest breaking that down into smaller sections. Focus on intonation first, then add the bowing technique.",
+                "That's a common challenge! Make sure to keep your shoulder relaxed and maintain consistent bow pressure.",
+                "Good observation! Try using a slower tempo and gradually increase speed as you become more comfortable.",
+                "That technique requires patience. Focus on the fundamentals and the advanced aspects will follow naturally."
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant typing-message';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span>AI is thinking</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingMessage = document.querySelector('.typing-message');
+            if (typingMessage) {
+                typingMessage.remove();
+            }
+        }
+
+        function toggleSidebar(side) {
+            const sidebar = document.getElementById(side + 'Sidebar');
+            const restoreBtn = document.getElementById(side + 'RestoreBtn');
+            
+            if (sidebar.classList.contains('minimized')) {
+                sidebar.classList.remove('minimized');
+                restoreBtn.style.display = 'none';
+            } else {
+                sidebar.classList.add('minimized');
+                restoreBtn.style.display = 'flex';
+            }
+        }
+
+        function toggleChatHistory() {
+            // Create a simple modal or dropdown for chat history
+            const existingModal = document.querySelector('.chat-history-modal');
+            if (existingModal) {
+                existingModal.remove();
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'chat-history-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Conversation History</h3>
+                        <button class="modal-close" onclick="this.closest('.chat-history-modal').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="history-list">
+                            ${Object.keys(conversations).length > 0 ? 
+                                Object.keys(conversations).map(id => `
+                                    <div class="history-item" onclick="loadConversation('${id}')">
+                                        <div class="history-title">Conversation ${id}</div>
+                                        <div class="history-preview">${conversations[id][0]?.content.substring(0, 50) || 'No messages'}...</div>
+                                    </div>
+                                `).join('') : 
+                                '<div class="no-history">No conversation history yet</div>'
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-backdrop" onclick="this.closest('.chat-history-modal').remove()"></div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function loadConversation(conversationId) {
+            if (conversations[conversationId]) {
+                currentConversationId = conversationId;
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.innerHTML = '';
+                
+                conversations[conversationId].forEach(msg => {
+                    addMessage(msg.sender, msg.content, false, msg.isInitial);
+                });
+                
+                showTemporaryMessage(`Loaded conversation ${conversationId}`);
+                document.querySelector('.chat-history-modal')?.remove();
+            }
+        }
+
+        function showTemporaryMessage(message) {
+            // Create temporary notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 2rem;
+                right: 2rem;
+                background: var(--md-sys-color-primary);
+                color: var(--md-sys-color-on-primary);
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: var(--md-sys-elevation-3);
+                z-index: 2000;
+                animation: slideInFromRight 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutToRight 0.3s ease-in forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        // Add slide animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInFromRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutToRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
