@@ -1,6 +1,5 @@
 // app.js loaded sentinel
 console.log("app.js loaded");
-if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js"; }
 
         let originalMainContentHTML = '';
         let isPreviewActive = false;
@@ -112,9 +111,6 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
 
         // Global state
         let selectedTechniques = [];
-        let currentConversationId = null;
-        let conversations = {};
-        let inDepthMode = false;
 
         // Auto-resize textarea
         function autoResize(textarea) {
@@ -273,7 +269,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                                 ${resultingSheets.map((sheet, index) => `
                                     <div class="sheet-item" data-title="${sheet.title}" data-composer="${sheet.composer}">
                                         <div class="sheet-thumbnail">
-                                            <img src="public/images/rode-01.png" alt="${sheet.title} thumbnail">
+                                            <img src="assets/images/rode-01.png" alt="${sheet.title} thumbnail">
                                         </div>
                                         <div class="sheet-info">
                                             <div class="sheet-title">${sheet.title}</div>
@@ -334,163 +330,13 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             `;
             
             // Initialize PDF rendering with PDF.js
-            initPDFViewer('public/images/rode-01.pdf');
+            PDFViewer.init('assets/images/rode-01.pdf');
             document.getElementById('topBackBtn').style.display = 'inline-flex';
 
             const downloadBtn = document.getElementById('pdf-download');
             if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => window.open('public/images/rode-01.pdf', '_blank'));
+                downloadBtn.addEventListener('click', () => window.open('assets/images/rode-01.pdf', '_blank'));
             }
-        }
-
-        // PDF.js viewer initialization
-        let pdfDoc = null,
-            pageNum = 1,
-            pageRendering = false,
-            pageNumPending = null,
-            scale = 1.25;
-
-        function initPDFViewer(url) {
-            // Reset state in case the viewer was previously used
-            pageNum = 1;
-            scale = 1.25;
-            
-            // Load the PDF
-            pdfjsLib.getDocument(url).promise.then(function(pdf) {
-                pdfDoc = pdf;
-                document.getElementById('page-count').textContent = pdf.numPages;
-                
-                // Initial/first page rendering
-                renderPage(pageNum);
-                
-                // Setup pagination controls
-                document.getElementById('prev-page').addEventListener('click', onPrevPage);
-                document.getElementById('next-page').addEventListener('click', onNextPage);
-                
-                // Setup zoom controls
-                document.getElementById('zoom-in').addEventListener('click', function() {
-                    scale += 0.25;
-                    renderPage(pageNum);
-                });
-                
-                document.getElementById('zoom-out').addEventListener('click', function() {
-                    if (scale > 0.5) {
-                        scale -= 0.25;
-                        renderPage(pageNum);
-                    }
-                });
-                
-                // Setup keyboard navigation
-                document.addEventListener('keydown', pdfKeyboardHandler);
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-                document.getElementById('pdf-container').innerHTML = `
-                    <div style="padding: 2rem; text-align: center;">
-                        <p>Unable to load PDF. Please try again later.</p>
-                        <a href="${url}" target="_blank" class="control-btn">Download PDF</a>
-                    </div>
-                `;
-            });
-        }
-
-        function renderPage(num) {
-            pageRendering = true;
-            
-            // Show loading indicator
-            const pdfContainer = document.getElementById('pdf-container');
-            const existingCanvas = document.getElementById('pdf-canvas');
-            
-            // Add loading state
-            pdfContainer.style.position = 'relative';
-            let loadingIndicator = document.getElementById('pdf-loading');
-            if (!loadingIndicator) {
-                loadingIndicator = document.createElement('div');
-                loadingIndicator.id = 'pdf-loading';
-                loadingIndicator.style.position = 'absolute';
-                loadingIndicator.style.top = '50%';
-                loadingIndicator.style.left = '50%';
-                loadingIndicator.style.transform = 'translate(-50%, -50%)';
-                loadingIndicator.style.background = 'rgba(0,0,0,0.7)';
-                loadingIndicator.style.color = 'white';
-                loadingIndicator.style.padding = '10px 20px';
-                loadingIndicator.style.borderRadius = '4px';
-                loadingIndicator.style.zIndex = '1000';
-                loadingIndicator.textContent = 'Loading page...';
-                pdfContainer.appendChild(loadingIndicator);
-            } else {
-                loadingIndicator.style.display = 'block';
-            }
-            
-            // Using promise to fetch the page
-            pdfDoc.getPage(num).then(function(page) {
-                // Calculate the optimal scale for viewing - adjust to fit width
-                const pdfContainerWidth = pdfContainer.clientWidth - 40; // 40px for padding
-                const rawViewport = page.getViewport({scale: 1});
-                const widthScale = pdfContainerWidth / rawViewport.width;
-                const adjustedScale = scale * widthScale;
-                
-                const viewport = page.getViewport({scale: adjustedScale});
-                const canvas = document.getElementById('pdf-canvas');
-                const context = canvas.getContext('2d');
-                
-                // Set canvas dimensions
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                // Render PDF page into canvas context
-                const renderContext = {
-                    canvasContext: context,
-                    viewport: viewport
-                };
-                const renderTask = page.render(renderContext);
-                
-                // Wait for rendering to finish
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-                    if (loadingIndicator) loadingIndicator.style.display = 'none';
-                    
-                    if (pageNumPending !== null) {
-                        // New page rendering is pending
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-                }).catch(function(error) {
-                    console.error('Error rendering PDF page:', error);
-                    if (loadingIndicator) loadingIndicator.style.display = 'none';
-                    pageRendering = false;
-                });
-            }).catch(function(error) {
-                console.error('Error getting PDF page:', error);
-                if (loadingIndicator) loadingIndicator.style.display = 'none';
-                pageRendering = false;
-            });
-            
-            // Update page counters
-            document.getElementById('page-num').textContent = num;
-        }
-        
-        function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
-            }
-        }
-        
-        function onPrevPage() {
-            if (pageNum <= 1) {
-                return;
-            }
-            pageNum--;
-            queueRenderPage(pageNum);
-        }
-        
-        function onNextPage() {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
-            pageNum++;
-            queueRenderPage(pageNum);
         }
 
         function exitSheetView() {
@@ -500,86 +346,14 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                 isViewingSheet = false;
                 
                 // Remove PDF-specific keyboard listeners when exiting the view
-                // (they will be reattached when entering the view again)
-                document.removeEventListener('keydown', pdfKeyboardHandler);
+                PDFViewer.cleanup();
                 document.getElementById('topBackBtn').style.display = 'none';
+                // Reattach click handlers for sheet thumbnails
+                attachSheetItemListeners();
             } else {
                 // Fallback: regenerate content
                 updateMainContent();
                 isViewingSheet = false;
-            }
-        }
-
-        // Separated keyboard handler for PDF viewing
-        function pdfKeyboardHandler(e) {
-            if (!isViewingSheet) return;
-            
-            if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-                onNextPage();
-            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-                onPrevPage();
-            } else if (e.key === '+') {
-                if (scale < 3) {
-                    scale += 0.25;
-                    renderPage(pageNum);
-                }
-            } else if (e.key === '-') {
-                if (scale > 0.5) {
-                    scale -= 0.25;
-                    renderPage(pageNum);
-                }
-            } else if (e.key === 'h' || e.key === '?') {
-                // Show keyboard shortcuts help
-                const helpElement = document.getElementById('pdf-shortcuts-help');
-                if (helpElement) {
-                    helpElement.style.display = helpElement.style.display === 'none' ? 'flex' : 'none';
-                } else {
-                    const helpDiv = document.createElement('div');
-                    helpDiv.id = 'pdf-shortcuts-help';
-                    helpDiv.style.position = 'absolute';
-                    helpDiv.style.top = '50%';
-                    helpDiv.style.left = '50%';
-                    helpDiv.style.transform = 'translate(-50%, -50%)';
-                    helpDiv.style.background = 'var(--md-sys-color-surface-container-high)';
-                    helpDiv.style.color = 'var(--md-sys-color-on-surface)';
-                    helpDiv.style.padding = '20px';
-                    helpDiv.style.borderRadius = '8px';
-                    helpDiv.style.zIndex = '2000';
-                    helpDiv.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-                    helpDiv.style.display = 'flex';
-                    helpDiv.style.flexDirection = 'column';
-                    helpDiv.style.gap = '10px';
-                    helpDiv.style.maxWidth = '400px';
-                    
-                    helpDiv.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3 style="margin:0;">Keyboard Shortcuts</h3>
-                            <button id="pdf-help-close" 
-                                style="background:none; border:none; cursor:pointer; color:var(--md-sys-color-on-surface);">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <hr style="border-color:var(--md-sys-color-outline-variant); margin:0;">
-                        <div style="display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;">
-                            <span><kbd>←</kbd> or <kbd>PageUp</kbd></span>
-                            <span>Previous page</span>
-                            <span><kbd>→</kbd> or <kbd>PageDown</kbd></span>
-                            <span>Next page</span>
-                            <span><kbd>+</kbd></span>
-                            <span>Zoom in</span>
-                            <span><kbd>-</kbd></span>
-                            <span>Zoom out</span>
-                            <span><kbd>h</kbd> or <kbd>?</kbd></span>
-                            <span>Show/hide this help</span>
-                        </div>
-                    `;
-                    
-                    document.getElementById('pdf-container').appendChild(helpDiv);
-                    const helpClose = helpDiv.querySelector('#pdf-help-close');
-                    if (helpClose) {
-                        helpClose.addEventListener('click', () => { helpDiv.style.display = 'none'; });
-                    }
-                }
             }
         }
 
@@ -626,8 +400,6 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                 counter.classList.remove('visible');
             }
         }
-
-        // Function definitions previously here were corrupted or deleted. Restoring them.
 
         function populateTechniques() {
             const container = document.getElementById('techniqueContainer');
@@ -720,46 +492,6 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             });
         }
 
-        function updateChatSendButton() {
-            const chatInput = document.querySelector('.chat-input');
-            const chatSendBtn = document.getElementById('chatSendBtn');
-            
-            if (chatInput && chatSendBtn) {
-                if (chatInput.value.trim() !== '') {
-                    chatSendBtn.classList.add('active');
-                    chatSendBtn.classList.add('pulse');
-                    setTimeout(() => chatSendBtn.classList.remove('pulse'), 600);
-                } else {
-                    chatSendBtn.classList.remove('active');
-                }
-            }
-        }
-
-        function simulateAIResponse(query, conversationId) {
-            if (currentConversationId !== conversationId) return;
-
-            showTypingIndicator();
-            setTimeout(() => {
-                if (currentConversationId !== conversationId) {
-                    hideTypingIndicator(); 
-                    return;
-                }
-                hideTypingIndicator();
-                const response = generateInitialAIResponse(query); 
-                addMessage('assistant', response, true); 
-            }, 1500); 
-        }
-
-        function startNewConversation(query) {
-            currentConversationId = Date.now().toString();
-            conversations[currentConversationId] = [];
-            inDepthMode = false;
-            
-            addMessage('user', query);
-            
-            if (query) simulateAIResponse(query, currentConversationId);
-        }
-
         function performSearch(isResetAction = false) { 
             const searchInput = document.querySelector('.search-input');
             const query = searchInput.value.trim().toLowerCase();
@@ -776,7 +508,7 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                 updateSelectionCounter();
                 updateMainContent(); 
                 if (!isResetAction) { // Only start new conversation if it's NOT a reset action from 'X' button
-                    startNewConversation(''); 
+                    Chat.startConversation(''); 
                 }
                 if (resetBtn) resetBtn.style.display = 'none'; // Ensure reset button is hidden
                 return;
@@ -788,22 +520,16 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             filterTechniques(query); 
             updateSelectionCounter(); 
             updateMainContent();    
-            startNewConversation(query); // This is for actual search queries with content
+            Chat.startConversation(query); // Delegate new conversation to chat module
         }
 
         function setupEventListeners() { 
             const searchInput = document.querySelector('.search-input'); 
             const resetSearchBtn = document.getElementById('resetSearchBtn'); // New reset button
-            const chatInput = document.querySelector('.chat-input');
-            const chatSendBtn = document.getElementById('chatSendBtn');
-            const aiChatSidebar = document.getElementById('aiChatSidebar');
             const leftMinimizeBtn = document.getElementById('leftMinimizeBtn');
             const rightMinimizeBtn = document.getElementById('rightMinimizeBtn');
             const leftRestoreBtn = document.getElementById('leftRestoreBtn');
             const rightRestoreBtn = document.getElementById('rightRestoreBtn');
-            const chatHistoryBtn = document.getElementById('chatHistoryBtn');
-            // const inDepthAnalysisBtn = document.querySelector('.in-depth-btn'); // This button is dynamically added
-            const topBackBtn = document.getElementById('topBackBtn');
 
             if (searchInput) { 
                 searchInput.addEventListener('input', function() {
@@ -828,66 +554,24 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
                 });
             }
 
-            // Event listeners for chat functionality (remains largely the same)
-            if (chatInput) {
-                autoResize(chatInput); 
-                chatInput.addEventListener('input', function() {
-                    autoResize(this);
-                    updateChatSendButton();
-                });
-                chatInput.addEventListener('focus', function() {
-                    this.closest('.chat-input-wrapper').classList.add('focused');
-                });
-                chatInput.addEventListener('blur', function() {
-                    this.closest('.chat-input-wrapper').classList.remove('focused');
-                });
-                chatInput.addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter' && !event.shiftKey) {
-                        event.preventDefault();
-                        const btn = document.getElementById('chatSendBtn');
-                        if (btn.classList.contains('active')) {
-                            btn.classList.add('sending');
-                            setTimeout(() => btn.classList.remove('sending'), 300);
-                            sendChatMessage();
-                        } else {
-                            this.closest('.chat-input-wrapper').classList.add('shake');
-                            setTimeout(() => this.closest('.chat-input-wrapper').classList.remove('shake'), 400);
-                        }
-                    }
-                });
-            }
-
-            if (chatSendBtn) {
-                chatSendBtn.addEventListener('click', sendChatMessage);
-            }
-
             if (leftMinimizeBtn) {
-                leftMinimizeBtn.addEventListener('click', () => toggleSidebar('left'));
+                leftMinimizeBtn.addEventListener('click', () => Sidebar.toggle('left'));
             }
             if (rightMinimizeBtn) {
-                rightMinimizeBtn.addEventListener('click', () => toggleSidebar('right'));
+                rightMinimizeBtn.addEventListener('click', () => Sidebar.toggle('right'));
             }
             if (leftRestoreBtn) {
-                leftRestoreBtn.addEventListener('click', () => toggleSidebar('left'));
+                leftRestoreBtn.addEventListener('click', () => Sidebar.toggle('left'));
             }
             if (rightRestoreBtn) {
-                rightRestoreBtn.addEventListener('click', () => toggleSidebar('right'));
+                rightRestoreBtn.addEventListener('click', () => Sidebar.toggle('right'));
             }
-            if (chatHistoryBtn) {
-                chatHistoryBtn.addEventListener('click', toggleChatHistory);
-            }
-            // The inDepthAnalysisBtn event listener is added when the button is created in addMessage
-
+            
+            // Add back button event listener
+            const topBackBtn = document.getElementById('topBackBtn');
             if (topBackBtn) {
-                topBackBtn.addEventListener('click', () => {
-                    if (isViewingSheet) {
-                        exitSheetView();
-                    }
-                });
+                topBackBtn.addEventListener('click', exitSheetView);
             }
-
-            updateChatSendButton();
-            // updateMainContent(); // Not needed here, performSearch or populateTechniques will handle it.
         }
 
         // Initialize the application
@@ -908,314 +592,3 @@ if (window.pdfjsLib) { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.c
             }
             setupEventListeners(); 
         });
-
-        function generateInitialAIResponse(query) {
-            // Generate contextual advice based on the query
-            const lowerQuery = query.toLowerCase();
-            let advice = '';
-            
-            if (lowerQuery.includes('bowing') || lowerQuery.includes('bow')) {
-                advice = 'For bowing technique development, focus on straight bow movement and consistent contact point. Start with long, slow bows to establish muscle memory.';
-            } else if (lowerQuery.includes('shift') || lowerQuery.includes('position')) {
-                advice = 'Position shifting requires precise finger placement and smooth thumb movement. Practice scales with marked position changes to build confidence.';
-            } else if (lowerQuery.includes('vibrato')) {
-                advice = 'Vibrato should be developed gradually, starting with arm vibrato before progressing to wrist and finger vibrato. Keep the motion relaxed and consistent.';
-            } else if (lowerQuery.includes('scale') || lowerQuery.includes('arpeggio')) {
-                advice = 'Scale practice is fundamental for intonation and finger independence. Use a metronome and practice in different rhythmic patterns.';
-            } else if (lowerQuery.includes('staccato') || lowerQuery.includes('spiccato')) {
-                advice = 'Articulated bowing techniques require precise bow control and timing. Start slowly and gradually increase tempo while maintaining clarity.';
-            } else if (lowerQuery.includes('double stops') || lowerQuery.includes('harmony')) {
-                advice = 'Double stops require careful intonation and bow distribution. Practice each interval separately before combining them.';
-            } else if (lowerQuery.includes('trill') || lowerQuery.includes('ornament')) {
-                advice = 'Ornaments should enhance the musical line. Start trills slowly and gradually increase speed while maintaining evenness.';
-            } else {
-                advice = 'Focus on fundamentals: posture, bow hold, and left hand position. Consistent daily practice with attention to detail will yield the best results.';
-            }
-            
-            return advice;
-        }
-
-        function addMessage(sender, content, isInitial = false) {
-            const messagesContainer = document.getElementById('chatMessages');
-            
-            // Remove empty state if present
-            const emptyState = messagesContainer.querySelector('.empty-state');
-            if (emptyState) {
-                emptyState.remove();
-            }
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-US', { 
-                hour: 'numeric', 
-                minute: '2-digit',
-                hour12: true 
-            });
-            
-            let messageHTML = `
-                <div class="message-bubble">${content}</div>
-                <div class="message-time">${timeStr}</div>
-            `;
-            
-            if (isInitial && sender === 'assistant') {
-                messageHTML += `
-                    <button class="in-depth-btn">
-                        <i class="fas fa-brain"></i>
-                        Get In-Depth Analysis
-                    </button>
-                `;
-            }
-            
-            messageDiv.innerHTML = messageHTML;
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
-            // Store in conversation
-            if (conversations[currentConversationId]) {
-                conversations[currentConversationId].push({
-                    sender,
-                    content,
-                    timestamp: now,
-                    isInitial
-                });
-            }
-
-            // attach listener for newly added in-depth button if present
-            const depthBtn = messageDiv.querySelector('.in-depth-btn');
-            if (depthBtn) {
-                depthBtn.addEventListener('click', requestInDepthAnalysis);
-            }
-        }
-
-        function requestInDepthAnalysis() {
-            inDepthMode = true;
-            
-            // Remove the in-depth button
-            const inDepthBtn = document.querySelector('.in-depth-btn');
-            if (inDepthBtn) {
-                inDepthBtn.remove();
-            }
-            
-            // Show typing indicator
-            showTypingIndicator();
-            
-            // Simulate detailed AI response
-            setTimeout(() => {
-                hideTypingIndicator();
-                const detailedResponse = generateInDepthResponse();
-                addMessage('assistant', detailedResponse);
-                
-                // Enable chat input for continued conversation
-                enableChatInput();
-            }, 2000);
-        }
-
-        function generateInDepthResponse() {
-            return `Here's a comprehensive analysis of your practice focus:
-
-**Technical Foundation:**
-- Establish proper posture and bow hold before advancing to complex techniques
-- Use a mirror to monitor your form and bow path
-- Record yourself playing to identify areas for improvement
-
-**Practice Strategy:**
-- Start with slow, deliberate movements to build muscle memory
-- Use a metronome to ensure rhythmic accuracy
-- Break complex passages into smaller, manageable segments
-
-**Progressive Development:**
-- Begin with foundational exercises before attempting advanced repertoire
-- Gradually increase tempo only after achieving technical accuracy
-- Focus on one technical aspect at a time to avoid overwhelming your practice
-
-Would you like specific exercises for any particular technique? I can provide detailed practice routines tailored to your current level.`;
-        }
-
-        function enableChatInput() {
-            const chatInput = document.querySelector('.chat-input');
-            chatInput.placeholder = 'Continue the conversation...';
-            chatInput.disabled = false;
-        }
-
-        function sendChatMessage() {
-            const chatInput = document.querySelector('.chat-input');
-            const message = chatInput.value.trim();
-            
-            if (!message || !currentConversationId) return;
-            
-            // Add user message
-            addMessage('user', message);
-            
-            // Clear input and update UI
-            chatInput.value = '';
-            autoResize(chatInput);
-            updateChatSendButton();
-            
-            // Show typing indicator
-            showTypingIndicator();
-            
-            // Simulate AI response with variable timing based on message length
-            const responseDelay = 800 + Math.min(message.length * 20, 1500) + (Math.random() * 800);
-            setTimeout(() => {
-                hideTypingIndicator();
-                const response = generateChatResponse(message);
-                addMessage('assistant', response);
-            }, responseDelay);
-        }
-
-        function generateChatResponse(message) {
-            const responses = [
-                "That's a great question! For that technique, I recommend starting with basic finger exercises to build strength and independence.",
-                "Excellent point! Try practicing that passage in different rhythmic patterns to improve your timing and coordination.",
-                "I suggest breaking that down into smaller sections. Focus on intonation first, then add the bowing technique.",
-                "That's a common challenge! Make sure to keep your shoulder relaxed and maintain consistent bow pressure.",
-                "Good observation! Try using a slower tempo and gradually increase speed as you become more comfortable.",
-                "That technique requires patience. Focus on the fundamentals and the advanced aspects will follow naturally."
-            ];
-            
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
-
-        function showTypingIndicator() {
-            const messagesContainer = document.getElementById('chatMessages');
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message assistant typing-message';
-            typingDiv.innerHTML = `
-                <div class="typing-indicator">
-                    <span>AI is thinking</span>
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                </div>
-            `;
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            const typingMessage = document.querySelector('.typing-message');
-            if (typingMessage) {
-                typingMessage.remove();
-            }
-        }
-
-        function toggleSidebar(side) {
-            const sidebar = document.getElementById(side + 'Sidebar');
-            const restoreBtn = document.getElementById(side + 'RestoreBtn');
-            
-            if (sidebar.classList.contains('minimized')) {
-                sidebar.classList.remove('minimized');
-                restoreBtn.style.display = 'none';
-            } else {
-                sidebar.classList.add('minimized');
-                restoreBtn.style.display = 'flex';
-            }
-        }
-
-        function toggleChatHistory() {
-            // Create a simple modal or dropdown for chat history
-            const existingModal = document.querySelector('.chat-history-modal');
-            if (existingModal) {
-                existingModal.remove();
-                return;
-            }
-
-            const modal = document.createElement('div');
-            modal.className = 'chat-history-modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Conversation History</h3>
-                        <button class="modal-close">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="history-list">
-                            ${Object.keys(conversations).length > 0 ? 
-                                Object.keys(conversations).map(id => `
-                                    <div class="history-item" data-id="${id}">
-                                        <div class="history-title">Conversation ${id}</div>
-                                        <div class="history-preview">${conversations[id][0]?.content.substring(0, 50) || 'No messages'}...</div>
-                                    </div>
-                                `).join('') : 
-                                '<div class="no-history">No conversation history yet</div>'
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-backdrop"></div>
-            `;
-            document.body.appendChild(modal);
-
-            // modal interactions
-            const closeBtn = modal.querySelector('.modal-close');
-            if (closeBtn) closeBtn.addEventListener('click', () => modal.remove());
-
-            const backdrop = modal.querySelector('.modal-backdrop');
-            if (backdrop) backdrop.addEventListener('click', () => modal.remove());
-
-            modal.querySelectorAll('.history-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    loadConversation(item.dataset.id);
-                    modal.remove();
-                });
-            });
-        }
-
-        function loadConversation(conversationId) {
-            if (conversations[conversationId]) {
-                currentConversationId = conversationId;
-                const messagesContainer = document.getElementById('chatMessages');
-                messagesContainer.innerHTML = '';
-                
-                conversations[conversationId].forEach(msg => {
-                    addMessage(msg.sender, msg.content, false, msg.isInitial);
-                });
-                
-                showTemporaryMessage(`Loaded conversation ${conversationId}`);
-                document.querySelector('.chat-history-modal')?.remove();
-            }
-        }
-
-        function showTemporaryMessage(message) {
-            // Create temporary notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 2rem;
-                right: 2rem;
-                background: var(--md-sys-color-primary);
-                color: var(--md-sys-color-on-primary);
-                padding: 1rem 1.5rem;
-                border-radius: 8px;
-                box-shadow: var(--md-sys-elevation-3);
-                z-index: 2000;
-                animation: slideInFromRight 0.3s ease-out;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOutToRight 0.3s ease-in forwards';
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
-        }
-
-        // Add slide animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInFromRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutToRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
