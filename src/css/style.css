@@ -84,15 +84,19 @@
             z-index: 1000;
         }
 
+        /* Sleek wordmark logo */
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--md-sys-color-primary);
+            font-family: "Inter", sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            color: var(--md-sys-color-on-surface);
             text-decoration: none;
-            min-width: max-content;
+            transition: color 0.2s ease;
+        }
+
+        .logo:hover {
+            color: var(--md-sys-color-primary);
         }
 
         .logo i {
@@ -235,8 +239,47 @@
         .main-content {
             display: flex;
             flex: 1;
-            overflow: hidden;
+            overflow: hidden; /* This is for the container of left-sidebar, main-sheet-music, right-sidebar */
             gap: 12px;
+        }
+
+        /* Styling for the scrollable area within the main content where etudes are shown */
+        #mainContent {
+            flex: 1;
+            overflow-y: auto; /* Make this area scrollable */
+            padding: 1.5rem; /* Match sidebar-content padding or adjust as needed */
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: var(--md-sys-color-outline-variant) transparent; /* For Firefox */
+        }
+
+        /* Webkit scrollbar styling for #mainContent */
+        #mainContent::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #mainContent::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #mainContent::-webkit-scrollbar-thumb {
+            background: var(--md-sys-color-outline-variant);
+            border-radius: 3px;
+            opacity: 0.6;
+        }
+
+        #mainContent::-webkit-scrollbar-thumb:hover {
+            background: var(--md-sys-color-outline);
+            opacity: 0.8;
+        }
+
+        /* Hide scrollbar when not hovered for #mainContent */
+        #mainContent::-webkit-scrollbar {
+            width: 0px; /* Initially hidden */
+            transition: width 0.3s ease;
+        }
+
+        #mainContent:hover::-webkit-scrollbar {
+            width: 6px; /* Show on #mainContent hover */
         }
 
         /* Sidebar Base Styles */
@@ -336,17 +379,32 @@
             margin-top: 0;
         }
 
-        .technique-section {
-            margin-bottom: 1.5rem;
+        /* Top-level accordion titles (e.g., 'Techniques', 'Composers') */
+        .section-header .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface);
+            text-transform: none;
+            letter-spacing: normal;
         }
 
-        .section-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--md-sys-color-primary);
+        .technique-section {
+            /* Spacing between sub-category groups */
+            margin-bottom: 2rem;
+        }
+
+        .technique-section:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Sub-category titles (e.g., 'Bowing Techniques') */
+        .technique-section .section-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface-variant);
             margin-bottom: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
         .technique-tags {
@@ -486,17 +544,18 @@
 
         .sheet-item {
             background: var(--md-sys-color-surface-container);
-            border-radius: 16px;
+            border-radius: 20px; /* Slightly softer radius */
             overflow: hidden;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid var(--md-sys-color-outline-variant);
+            border: 1px solid transparent; /* Subtle border by default */
+            box-shadow: var(--md-sys-elevation-1); /* Softer default shadow */
         }
 
         .sheet-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--md-sys-elevation-4);
-            border-color: var(--md-sys-color-primary);
+            transform: translateY(-5px); /* Slightly more lift */
+            box-shadow: var(--md-sys-elevation-5); /* More prominent shadow on hover */
+            border-color: var(--md-sys-color-primary-container); /* Use primary container for border */
         }
 
         .sheet-thumbnail {
@@ -522,13 +581,45 @@
         .sheet-title {
             font-weight: 600;
             color: var(--md-sys-color-on-surface);
-            margin-bottom: 0.25rem;
-            font-size: 0.875rem;
+            margin-bottom: 0.35rem; /* Increased spacing */
+            font-size: 0.9rem; /* Slightly larger title */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Handle long titles */
         }
 
         .sheet-composer {
             color: var(--md-sys-color-on-surface-variant);
             font-size: 0.75rem;
+            margin-bottom: 0.5rem; /* Add space before difficulty */
+        }
+
+        .sheet-difficulty {
+            display: inline-block; /* To allow padding and border-radius */
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            color: var(--md-sys-color-on-primary-container);
+            background-color: var(--md-sys-color-secondary-container); /* Default, can be overridden */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Specific difficulty styling - can be expanded with JS if needed to add classes */
+        .sheet-item[data-difficulty="Beginner"] .sheet-difficulty {
+            background-color: var(--md-sys-color-tertiary-container);
+            color: var(--md-sys-color-on-tertiary-container);
+        }
+
+        .sheet-item[data-difficulty="Intermediate"] .sheet-difficulty {
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+        }
+
+        .sheet-item[data-difficulty="Advanced"] .sheet-difficulty {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
         }
 
         .sheet-viewer {
@@ -1316,4 +1407,98 @@
         .right-sidebar {
             margin-top: 0 !important;
             border-radius: 12px;
+        }
+
+        /* Accordion Filter Sections */
+        .filter-section {
+            margin-bottom: 1rem;
+        }
+
+        .filter-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            cursor: pointer;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .section-header:hover {
+            background: var(--md-sys-color-surface-container);
+            border-radius: 8px;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--md-sys-color-on-surface-variant);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .section-toggle {
+            background: none;
+            border: none;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        .section-toggle:hover {
+            background: var(--md-sys-color-surface-container-high);
+            color: var(--md-sys-color-primary);
+        }
+
+        .section-toggle i {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.75rem;
+        }
+
+        .section-toggle[aria-expanded="false"] i {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+        }
+
+        .section-content.expanded {
+            max-height: 1000px;
+            opacity: 1;
+            margin-bottom: 0.75rem;
+        }
+
+        /* No results message */
+        .no-results {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .no-results p {
+            margin: 0;
+            font-size: 0.875rem;
         }

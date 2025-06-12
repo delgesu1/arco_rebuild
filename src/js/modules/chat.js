@@ -158,21 +158,32 @@
   }
 
   function generateInDepthResponse() {
-    return `Here's a comprehensive analysis:
+    return `
+      <h3 class="chat-section-title">Comprehensive Analysis</h3>
 
-**Technical Foundation:**
-- Proper posture and bow hold.
-- Use a mirror to monitor form.
+      <h4 class="chat-subtitle">Technical Foundation</h4>
+      <ul class="chat-list">
+        <li>Maintain <strong>proper posture</strong> and balanced bow hold.</li>
+        <li>Use a mirror to continually monitor form.</li>
+        <li>Keep shoulders relaxed to avoid tension-related injuries.</li>
+      </ul>
 
-**Practice Strategy:**
-- Slow, deliberate movements.
-- Metronome for rhythmic accuracy.
+      <h4 class="chat-subtitle">Practice Strategy</h4>
+      <ul class="chat-list">
+        <li>Practice with <strong>slow, deliberate</strong> movements for accuracy.</li>
+        <li>Employ a metronome to build rhythmic stability.</li>
+        <li>Segment difficult passages and loop them.</li>
+      </ul>
 
-**Progressive Development:**
-- Start foundational before advanced.
-- Increase tempo after accuracy.
+      <h4 class="chat-subtitle">Progressive Development</h4>
+      <ul class="chat-list">
+        <li>Begin with foundational techniques before advancing.</li>
+        <li>Gradually <strong>increase tempo</strong> only after consistent accuracy.</li>
+        <li>Record yourself weekly to track progress.</li>
+      </ul>
 
-Would you like specific exercises?`;
+      <p class="chat-conclusion">Would you like specific exercises tailored to your current level?</p>
+    `;
   }
 
   function enableChatInput() {
@@ -225,6 +236,34 @@ Would you like specific exercises?`;
   const styleEl = document.createElement('style');
   styleEl.textContent = `
     .chat-history-modal { /* minimal styles */ }
+
+    /* Improved message bubble typography */
+    .message.assistant .message-bubble {
+      line-height: 1.55;
+    }
+    .chat-section-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--md-sys-color-primary);
+    }
+    .chat-subtitle {
+      margin: 0.75rem 0 0.25rem 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .chat-list {
+      padding-left: 1.25rem;
+      margin: 0;
+    }
+    .chat-list li {
+      margin-bottom: 0.25rem;
+    }
+    .chat-conclusion {
+      margin-top: 1rem;
+      font-style: italic;
+    }
   `;
   document.head.appendChild(styleEl);
 
