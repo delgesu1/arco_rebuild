@@ -17,7 +17,7 @@ Legend
 |0.3|Add prettier + commitlint + husky for pre-commit lint| |
 |0.4|Configure absolute imports (`@/components`, `@/lib`)| |
 |0.5|Create `.env.local.example` with placeholder secrets (LLM, DB, Stripe)| |
-|0.6|Install `react-pdf` & `pdfjs-dist` packages| |
+|0.6|Install `react-pdf` & `pdfjs-dist` packages.<br>_Ensure React-PDF's AnnotationLayer & TextLayer CSS is imported (globally or in PdfViewer component)._| |
 |0.7|If on Next.js ≤14, add `swcMinify: false` to `next.config.js`| |
 
 ---
@@ -52,19 +52,23 @@ Break the 2 000-line `main.js` into declarative React components.  Aim for minim
 |Component|Files To Create|Special Notes|
 |---------|---------------|-------------|
 |`Header`|`components/Header.tsx`|Search bar logic → controlled input + debounce.| 
-|`Sidebar`|`components/sidebar/…`|Hover preview + selection toggles.<br>Use `onMouseEnter/Leave` to replicate the persistentSelection logic.| 
+|`Sidebar`|`components/sidebar/…`|Hover preview + selection toggles. Display technique/composer **selection counts**. Use `onMouseEnter/Leave` & Zustand state (`hoveredFilter`, `selectedTechniques`, `selectedComposers`) to replicate persistentSelection logic.| 
 |`TechniqueTag`|`components/TechniqueTag.tsx`|Clickable chip; style matches CSS.| 
 |`ComposerFilter`|`components/ComposerFilter.tsx`|Handles `toggleComposerSelection`.| 
 |`SheetGrid`|`components/SheetGrid.tsx`|Maps etude data → `SheetCard`.| 
 |`SheetCard`|`components/SheetCard.tsx`|`viewSheetMusic` handler opens viewer.| 
-|`PdfViewer`|`components/PdfViewer.tsx`|Build with **React-PDF**; dynamic import (SSR off), set `pdfjs` workerSrc; retain zoom & keyboard controls.| 
-|`Chat`|`components/chat/Chat.tsx`|Move `chat.js` behaviour; store messages in context.| 
+|`PdfViewer`|`components/PdfViewer.tsx`|Build with **React-PDF** (see Suppl. Note 2 for dynamic import & CSS); dynamic import (SSR off), set `pdfjs` workerSrc; retain zoom, **page navigation (keyboard/UI)**, and other existing controls.| 
+|`Chat`|`components/chat/Chat.tsx`|Move `chat.js` behaviour; store messages in context/Zustand. Implement **auto-resizing textarea** and existing open/minimize/clear history functionality.| 
 
 ✅ **Parity:**
 - Left sidebar hover, collapse, multi-select keep identical UX.
+- **Technique/Composer selection counters in sidebar update correctly.**
 - Search bar filters list in real-time.
-- Clicking a sheet opens PDF viewer overlay.
+- Clicking a sheet opens PDF viewer overlay (retaining zoom, page navigation etc.).
 - Chat sends/receives stub messages (still mock until Phase 6).
+- Chat box opens, minimises, clears history exactly as current JS demo.
+- **Chat textarea auto-resizes based on content.**
+- No regression on mobile layout breakpoints.
 
 ---
 
@@ -146,6 +150,8 @@ Steps:
    'use client';
    import dynamic from 'next/dynamic';
    import { pdfjs } from 'react-pdf';
+   import 'react-pdf/dist/Page/AnnotationLayer.css'; // Verify path based on actual import structure
+   import 'react-pdf/dist/Page/TextLayer.css';     // Verify path based on actual import structure
 
    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
      'pdfjs-dist/build/pdf.worker.min.mjs',
