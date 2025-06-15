@@ -17,6 +17,8 @@ Legend
 |0.3|Add prettier + commitlint + husky for pre-commit lint| |
 |0.4|Configure absolute imports (`@/components`, `@/lib`)| |
 |0.5|Create `.env.local.example` with placeholder secrets (LLM, DB, Stripe)| |
+|0.6|Install `react-pdf` & `pdfjs-dist` packages| |
+|0.7|If on Next.js ≤14, add `swcMinify: false` to `next.config.js`| |
 
 ---
 
@@ -55,7 +57,7 @@ Break the 2 000-line `main.js` into declarative React components.  Aim for minim
 |`ComposerFilter`|`components/ComposerFilter.tsx`|Handles `toggleComposerSelection`.| 
 |`SheetGrid`|`components/SheetGrid.tsx`|Maps etude data → `SheetCard`.| 
 |`SheetCard`|`components/SheetCard.tsx`|`viewSheetMusic` handler opens viewer.| 
-|`PdfViewer`|`components/PdfViewer.tsx`|Wrap PDF.js; use `useRef` for canvas.| 
+|`PdfViewer`|`components/PdfViewer.tsx`|Build with **React-PDF**; dynamic import (SSR off), set `pdfjs` workerSrc; retain zoom & keyboard controls.| 
 |`Chat`|`components/chat/Chat.tsx`|Move `chat.js` behaviour; store messages in context.| 
 
 ✅ **Parity:**
@@ -139,9 +141,17 @@ Steps:
 1. **Project Bootstrap Flags**  
    Use `pnpm create next-app@latest arco-next -- --ts --tailwind --eslint --app --src-dir --import-alias "@/*"` for a more opinionated, space-efficient setup.
 
-2. **Dynamic PDF.js Import**  
-   Wrap the viewer with Next’s dynamic import to avoid SSR issues:
+2. **Dynamic React-PDF Import & Worker Setup**  
    ```ts
+   'use client';
+   import dynamic from 'next/dynamic';
+   import { pdfjs } from 'react-pdf';
+
+   pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+     'pdfjs-dist/build/pdf.worker.min.mjs',
+     import.meta.url,
+   ).toString();
+
    const PdfViewer = dynamic(() => import('@/components/PdfViewer'), { ssr: false });
    ```
 
