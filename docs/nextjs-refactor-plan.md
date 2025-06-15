@@ -131,3 +131,44 @@ Steps:
 ---
 
 > **Tip:** keep the old app live at `/legacy` during migration for quick side-by-side comparison.
+
+---
+
+## Supplemental Implementation Notes (merged insights)
+
+1. **Project Bootstrap Flags**  
+   Use `pnpm create next-app@latest arco-next -- --ts --tailwind --eslint --app --src-dir --import-alias "@/*"` for a more opinionated, space-efficient setup.
+
+2. **Dynamic PDF.js Import**  
+   Wrap the viewer with Next’s dynamic import to avoid SSR issues:
+   ```ts
+   const PdfViewer = dynamic(() => import('@/components/PdfViewer'), { ssr: false });
+   ```
+
+3. **Zustand Store Shape & Derived Selector**  
+   ```ts
+   interface AppState {
+     selectedTechniques: string[];
+     selectedComposers: string[];
+     hoveredFilter: string | null;
+     searchQuery: string;
+     activeSheet: number | null;
+     isViewingSheet: boolean;
+     chatHistory: ChatMessage[];
+   }
+   // derived logic replicating hover-preview vs selection
+   const visibleFilters = state.hoveredFilter ? [state.hoveredFilter] : state.selectedTechniques;
+   ```
+   Include *max-three* validation inside `toggleTechnique`.
+
+4. **API Abstraction Layer**  
+   Create `src/lib/api.ts` early. Components call functions like `getEtudes(filters)` even while they still read static JSON. Swap to real DB/API later with zero component changes.
+
+5. **Tailwind ESLint Plugin & Codemods**  
+   Add `eslint-plugin-tailwindcss` and run Next.js codemods to keep the codebase idiomatic.
+
+6. **Risk & QA per Phase**  
+   Record a short risk note in each phase table and a green-light *Done* column to check off.
+
+These additions have been integrated into this document to provide a bullet-proof migration path.
+
